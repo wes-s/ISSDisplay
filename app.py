@@ -184,7 +184,7 @@ class getDisplay(Resource):
         # p = show(row(n, s))
 
         p = row(n,s)
-        script, div = components(n)
+        script, div = components(p)
         return make_response(render_template('index.html', script=script, div=div))
 
 api.add_resource(getDisplay,"/getDisplay/<string:settings>")
