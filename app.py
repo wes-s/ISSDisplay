@@ -148,27 +148,27 @@ class getDisplay(Resource):
 
         def getLights(userLat):
             if userLat >= 0:
-                im = Image.open('images/north_lights.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/north_lights.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
             else:
-                im = Image.open('images/south_lights.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/south_lights.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
             imArray = np.array(im)
             return imArray
 
         def getNight(userLat):
             if userLat >= 0:
-                im = Image.open('images/north_night.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/north_night.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
             else:
-                im = Image.open('images/south_night.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/south_night.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
             imArray = np.array(im)
             return imArray
 
         def getCorners():
-            im = Image.open('images/corners.png').convert('RGBA')
+            im = Image.open('Images/corners.png').convert('RGBA')
             imArray = np.array(im)
             return imArray
 
         def getISS():
-            im = Image.open('images/iss.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            im = Image.open('Images/iss.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
             imArray = np.array(im)
             return imArray
 
