@@ -113,9 +113,9 @@ class getDisplay(Resource):
 
             # read image as RGB and add alpha (transparency)
             if userLat >=0:
-                im = Image.open('images/north_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/north_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
             else:
-                im = Image.open('images/south_day.png').convert('RGBA').transpose(Image.FLIP_LEFT_RIGHT)
+                im = Image.open('Images/south_day.png').convert('RGBA').transpose(Image.FLIP_LEFT_RIGHT)
 
                 # im = day.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
 
@@ -155,26 +155,26 @@ class getDisplay(Resource):
 
         ###NORTHERN HEMISPHERE
         n = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
-        n.image_url(url=['images/north_night.png'], w=1000, h=1000, x=-500, y = 500)
-        n.image_url(url=['images/north_lights.png'], w=1000, h=1000, x=-500, y = 500)
+        n.image_url(url=['Images/north_night.png'], w=1000, h=1000, x=-500, y = 500)
+        n.image_url(url=['Images/north_lights.png'], w=1000, h=1000, x=-500, y = 500)
         n.image_rgba(image=[northImArray], x =-500, y=-500, dh =1000, dw=1000)
         n.line(northISSdf.x, northISSdf.y, color="blue", line_dash=[10,5], line_width=2)
         n.circle(northISSdf.loc[5]['x'], northISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
-        n.image_url(url=['images/iss.png'], w=80, h=80, x=northISSdf.loc[5]['x']-40, y = northISSdf.loc[5]['y']+40)
-        n.image_url(url=['images/corners.png'], w=1000, h=1000, x=-500, y = 500)
+        n.image_url(url=['Images/iss.png'], w=80, h=80, x=northISSdf.loc[5]['x']-40, y = northISSdf.loc[5]['y']+40)
+        n.image_url(url=['Images/corners.png'], w=1000, h=1000, x=-500, y = 500)
         n.background_fill_color = "#000000"
         n.toolbar_location = None
         n.axis.visible = False
 
         ###SOUTHERN HEMISPHERE
         s = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
-        s.image_url(url=['images/south_night.png'], w=1000, h=1000, x=-500, y = 500)
-        s.image_url(url=['images/south_lights.png'], w=1000, h=1000, x=-500, y = 500)
+        s.image_url(url=['Images/south_night.png'], w=1000, h=1000, x=-500, y = 500)
+        s.image_url(url=['Images/south_lights.png'], w=1000, h=1000, x=-500, y = 500)
         s.image_rgba(image=[southImArray], x =-500, y=-500, dh =1000, dw=1000)
         s.line(southISSdf.x, southISSdf.y, color="blue", line_dash=[10,5], line_width=2)
         s.circle(southISSdf.loc[5]['x'], southISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
-        s.image_url(url=['images/iss.png'], w=80, h=80, x=southISSdf.loc[5]['x']-40, y = southISSdf.loc[5]['y']+40)
-        s.image_url(url=['images/corners.png'], w=1000, h=1000, x=-500, y = 500)
+        s.image_url(url=['Images/iss.png'], w=80, h=80, x=southISSdf.loc[5]['x']-40, y = southISSdf.loc[5]['y']+40)
+        s.image_url(url=['Images/corners.png'], w=1000, h=1000, x=-500, y = 500)
         s.background_fill_color = "#000000"
         s.toolbar_location = None
         s.axis.visible = False
