@@ -22,8 +22,13 @@ class getDisplay(Resource):
             lon1 = 0.0
             dayOfYear = float(datetime.utcnow().timetuple().tm_yday)
             minOfDay = float (datetime.utcnow().hour*60+datetime.utcnow().minute)
+            #print(minOfDay)
+            #print minOfDay
+            #print('Today is day number: '+ str(dayOfYear))
             declAngle = 23.45*math.sin(math.radians(360.0/365.0 * (284.99+dayOfYear)))
+            #print('The Sun is directly over: ' + str(declAngle) + ', ' + str(-1*360.0*(minOfDay-720)/1440.0))
             brng = 0.0
+
             lat1 = math.radians(declAngle)
             lon1 = math.radians(-1*(360.0*(minOfDay-720)/1440.0))
             d = 10001.0
@@ -35,7 +40,10 @@ class getDisplay(Resource):
                 lon2=round(math.degrees(lon1+math.atan2(math.sin(math.radians(brng))*math.sin(d/R)*math.cos(lat1),math.cos(d/R)-math.sin(lat1)*math.sin(math.radians(lat2)))),5)
                 if lon2<-180:
                     lon2=lon2+360
-                point = {'lat':lat2,'lon':lon2}
+            #     print('Bearing: '+str(brng)+': '+str(lat2)+', '+ str(lon2))
+                #objID = int((brng+5)/5)
+        #         proj = eqAzProjection(lat2, lon2, userLat, height)
+                point = {'lat':lat2,'lon':lon2}#,'x':proj['x'],'y':proj['y']}
                 sunList.update({i:point})
                 brng = brng+5.0
             df = pd.DataFrame.from_dict(sunList, orient='index')
@@ -43,8 +51,9 @@ class getDisplay(Resource):
             return df
 
         def getISSList(userLat, height):
+        #     now = datetime.timestamp(datetime.utcnow())
             now = datetime.timestamp(datetime.now())
-            stamp = int(now - (now%60)-1080)
+            stamp = int(now - (now%60)-1080);
             url = "https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps="+ str(stamp)+",";
 
             for i in range(1,35):
@@ -52,12 +61,11 @@ class getDisplay(Resource):
                     url = url + str(stamp+(180*i))+ ','
                 else:
                     url = url + str(stamp+(180*i))+ '&units=miles'
-            
+
             response = requests.get(url)
-            df= pd.DataFrame(columns=['latitude', 'longitude'])
             if response:
                 issDf = pd.read_json(response.content)
-                df = issDf[['latitude','longitude']]
+            df = issDf[['latitude','longitude']]
             df.columns = ['lat', 'lon']
             df = df.apply(eqAzProjection,args=(userLat,height),axis=1)
             df[:]['y_raw']= (df[:]['y_raw'])
@@ -88,7 +96,7 @@ class getDisplay(Resource):
             subset = sunList[['x', 'y']]
             subset[:]['x']=subset[:]['x']+500
             subset[:]['y']=subset[:]['y']+500
-            
+
             tuples = [tuple(x) for x in subset.values]
 
             imFilter = Image.new('RGBA', (1000, 1000), (0, 0, 0, 0))
@@ -109,8 +117,16 @@ class getDisplay(Resource):
             else:
                 im = Image.open('images/south_day.png').convert('RGBA').transpose(Image.FLIP_LEFT_RIGHT)
 
+                # im = day.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+
             # convert to numpy (for convenience)
             imArray = np.asarray(im)
+
+            # create mask
+            # polygon = tuples # [(100,100), (200,100), (150,150)]
+            # maskIm = Image.new('L', (imArray.shape[0], imArray.shape[1]), 0)
+            # ImageDraw.Draw(maskIm).polygon(polygon, outline=0, fill=1)
+            # mask = np.array(maskIm)
 
             # assemble new image (uint8: 0-255)
             newImArray = np.empty(imArray.shape,dtype='uint8')
@@ -119,6 +135,7 @@ class getDisplay(Resource):
             newImArray[:,:,:3] = imArray[:,:,:3]
 
             # transparency (4th column)
+            # newImArray[:,:,3] = mask*255
             newImArray[:,:,3] = imFilterArray[:,:,3]
 
             # back to Image from numpy
@@ -162,9 +179,11 @@ class getDisplay(Resource):
         s.toolbar_location = None
         s.axis.visible = False
 
+
         # output_notebook(hide_banner=True)
         # p = show(row(n, s))
-        # p = row(n,s)
+
+        p = row(n,s)
         script, div = components(n)
         return make_response(render_template('index.html', script=script, div=div))
 
