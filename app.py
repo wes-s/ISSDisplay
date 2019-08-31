@@ -91,7 +91,7 @@ class getDisplay(Resource):
             s['y_raw'] = (k*(math.cos(t1)*math.sin(radLat)-math.sin(t1)*math.cos(radLat)*math.cos(radLon-lZero)))
             return s
 
-        def getDayLightImage(userLat, height):
+        def getDay(userLat, height):
             sunList = getSunList(userLat,height)
             subset = sunList[['x', 'y']]
             subset[:]['x']=subset[:]['x']+500
@@ -146,39 +146,70 @@ class getDisplay(Resource):
             finalImArray = np.array(newIm)
             return finalImArray
 
+        def getLights(userLat):
+            if userLat >= 0:
+                im = Image.open('images/north_lights.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            else:
+                im = Image.open('images/south_lights.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            imArray = np.array(im)
+            return imArray
+
+        def getNight(userLat):
+            if userLat >= 0:
+                im = Image.open('images/north_night.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            else:
+                im = Image.open('images/south_night.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            imArray = np.array(im)
+            return imArray
+
+        def getCorners():
+            im = Image.open('images/corners.png').convert('RGBA')
+            imArray = np.array(im)
+            return imArray
+
+        def getISS():
+            im = Image.open('images/iss.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            imArray = np.array(im)
+            return imArray
+
         userLat = 35 
         height = 500
         northISSdf = getISSList(userLat,height)
         southISSdf = getISSList(-userLat,height)
-        northImArray = getDayLightImage(userLat,height)
-        southImArray = getDayLightImage(-userLat,height)
+        northDay = getDay(userLat,height)
+        southDay = getDay(-userLat,height)
+        northNight = getNight(userLat)
+        southNight = getNight(-userLat)
+        northLights = getLights(userLat)
+        southLights = getLights(-userLat)
+        corners = getCorners()
+        iss = getISS()
 
         ###NORTHERN HEMISPHERE
         n = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
-        n.image_url(url=['Images/north_night.png'], w=1000, h=1000, x=-500, y = 500)
-        n.image_url(url=['Images/north_lights.png'], w=1000, h=1000, x=-500, y = 500)
-        n.image_rgba(image=[northImArray], x =-500, y=-500, dh =1000, dw=1000)
+        n.image_rgba(image=[northNight], x =-500, y=-500, dh =1000, dw=1000)
+        n.image_rgba(image=[northLights], x =-500, y=-500, dh =1000, dw=1000)
+        n.image_rgba(image=[northDay], x =-500, y=-500, dh =1000, dw=1000)
         n.line(northISSdf.x, northISSdf.y, color="blue", line_dash=[10,5], line_width=2)
         n.circle(northISSdf.loc[5]['x'], northISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
-        n.image_url(url=['Images/iss.png'], w=80, h=80, x=northISSdf.loc[5]['x']-40, y = northISSdf.loc[5]['y']+40)
-        n.image_url(url=['Images/corners.png'], w=1000, h=1000, x=-500, y = 500)
+        n.image_rgba(image=[iss], x=northISSdf.loc[5]['x']-40, y = northISSdf.loc[5]['y']-40, dh =80, dw=80)
+        n.image_rgba(image=[corners], x =-500, y=-500, dh =1000, dw=1000)
         n.background_fill_color = "#000000"
         n.toolbar_location = None
         n.axis.visible = False
 
         ###SOUTHERN HEMISPHERE
         s = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
-        s.image_url(url=['Images/south_night.png'], w=1000, h=1000, x=-500, y = 500)
-        s.image_url(url=['Images/south_lights.png'], w=1000, h=1000, x=-500, y = 500)
-        s.image_rgba(image=[southImArray], x =-500, y=-500, dh =1000, dw=1000)
+        s.image_rgba(image=[southNight], x =-500, y=-500, dh =1000, dw=1000)
+        s.image_rgba(image=[southLights], x =-500, y=-500, dh =1000, dw=1000)
+        s.image_rgba(image=[southDay], x =-500, y=-500, dh =1000, dw=1000)
         s.line(southISSdf.x, southISSdf.y, color="blue", line_dash=[10,5], line_width=2)
         s.circle(southISSdf.loc[5]['x'], southISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
-        s.image_url(url=['Images/iss.png'], w=80, h=80, x=southISSdf.loc[5]['x']-40, y = southISSdf.loc[5]['y']+40)
-        s.image_url(url=['Images/corners.png'], w=1000, h=1000, x=-500, y = 500)
+        s.image_rgba(image=[iss], x=southISSdf.loc[5]['x']-40, y = southISSdf.loc[5]['y']-40, dh =80, dw=80)
+        s.image_rgba(image=[corners], x =-500, y=-500, dh =1000, dw=1000)
         s.background_fill_color = "#000000"
         s.toolbar_location = None
         s.axis.visible = False
-
 
         # output_notebook(hide_banner=True)
         # p = show(row(n, s))
