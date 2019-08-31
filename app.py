@@ -164,8 +164,8 @@ class getDisplay(Resource):
 
         # output_notebook(hide_banner=True)
         # p = show(row(n, s))
-        p = row(n,s)
-        script, div = components(p)
+        # p = row(n,s)
+        script, div = components(n)
         return make_response(render_template('index.html', script=script, div=div))
 
 api.add_resource(getDisplay,"/getDisplay/<string:settings>")
