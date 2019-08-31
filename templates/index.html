@@ -1,0 +1,21 @@
+<html>
+<head>
+    <script src="//cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.js"></script>
+    <script src="//cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.js"></script>
+    <style>
+        body { background: #000000; }
+    </style>
+    <meta charset="utf-8">
+    {{ bokeh_css }}
+    {{ bokeh_js }}
+</head>
+<body onload="window.scrollTo(0,document.body.scrollHeight);">
+    {{script|safe}}
+    {{div|safe}}
+    <script>
+        setTimeout(function(){
+        window.location.reload(1);
+        }, 3000);
+    </script>
+</body>
+</html>
