@@ -195,9 +195,6 @@ class getDisplay(Resource):
         c.circle(northISSdf.loc[5]['x']-500, northISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
         c.image_rgba(image=[iss], x=northISSdf.loc[5]['x']-540, y = northISSdf.loc[5]['y']-40, dh =80, dw=80)
         c.image_rgba(image=[corners], x =-1000, y=-500, dh =1000, dw=1000)
-        c.background_fill_color = "#000000"
-        c.toolbar_location = None
-        c.axis.visible = False
 
         ###SOUTHERN HEMISPHERE
         # s = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
@@ -208,14 +205,15 @@ class getDisplay(Resource):
         c.circle(southISSdf.loc[5]['x']+500, southISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
         c.image_rgba(image=[iss], x=southISSdf.loc[5]['x']+460, y = southISSdf.loc[5]['y']-40, dh =80, dw=80)
         c.image_rgba(image=[corners], x =0, y=-500, dh =1000, dw=1000)
+        
         c.background_fill_color = "#000000"
         c.toolbar_location = None
         c.axis.visible = False
-
+        c.border_fill_color = '#000000'
+        
         # output_notebook(hide_banner=True)
         # p = show(row(n, s))
         # p = row(n,s)
-        c.border_fill_color = '#000000'
         script, div = components(c)
         return make_response(render_template('index.html', script=script, div=div))
 
