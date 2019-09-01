@@ -50,7 +50,7 @@ class getDisplay(Resource):
             df = df.apply(eqAzProjection,args=(userLat,height),axis=1)
             return df
 
-        def getISSList(userLat, height):
+        def getISSList():
             
             now = datetime.timestamp(datetime.now())
             
@@ -72,6 +72,9 @@ class getDisplay(Resource):
             df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
             'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
             'visibility']
+            return df
+            
+        def projectISSdf(df, userLat, height):
             
             #Get projected chart space X's and Y's from the projection func which adds them to the dataframe
             df = df.apply(eqAzProjection,args=(userLat,height),axis=1)
@@ -87,7 +90,8 @@ class getDisplay(Resource):
                 df.loc[df.eval('x>=-500'),'keepy'] = df.y
             df['x'] = df['keepx']
             df['y'] = df['keepy']
-            df.drop(['keepx', 'keepy'], axis=1)
+            df.drop(['keepx'], axis=1)
+            df.drop(['keepy'],axis=1)    
             return df
 
         def eqAzProjection(s , userLat, height):
@@ -190,8 +194,9 @@ class getDisplay(Resource):
 
         userLat = 35 
         height = 500
-        northISSdf = getISSList(userLat,height)
-        southISSdf = getISSList(-userLat,height)
+        issList = getISSList()
+        northISSdf = projectISSdf(issList, userLat, height)
+        southISSdf = projectISSdf(issList, -userLat,height)
         northDay = getDay(userLat,height)
         southDay = getDay(-userLat,height)
         northNight = getNight(userLat)
