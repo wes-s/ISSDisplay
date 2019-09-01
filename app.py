@@ -3,8 +3,8 @@ from flask_restful import Api, Resource
 from datetime import datetime
 import pandas as pd
 from bokeh.palettes import plasma
-from bokeh.plotting import figure
-from bokeh.layouts import row
+from bokeh.plotting import figure, show
+from bokeh.layouts import row, gridplot
 from bokeh.embed import components
 import math
 from PIL import Image, ImageDraw, ImageFilter
@@ -214,7 +214,7 @@ class getDisplay(Resource):
         # output_notebook(hide_banner=True)
         # p = show(row(n, s))
 
-        p = row(n,s)
+        p = show(row(n,s))
         script, div = components(p)
         return make_response(render_template('index.html', script=script, div=div))
 
