@@ -51,11 +51,14 @@ class getDisplay(Resource):
             return df
 
         def getISSList(userLat, height):
-        #     now = datetime.timestamp(datetime.utcnow())
+            
             now = datetime.timestamp(datetime.now())
+            
+            #start in the past 18 minutes
             stamp = int(now - (now%60)-1080);
             url = "https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps="+ str(stamp)+",";
-
+            
+            #append 35 more timestamps separated by 3 minutes each to the request URL
             for i in range(1,35):
                 if i < 34:
                     url = url + str(stamp+(180*i))+ ','
@@ -65,13 +68,26 @@ class getDisplay(Resource):
             response = requests.get(url)
             if response:
                 issDf = pd.read_json(response.content)
-            df = issDf[['latitude','longitude']]
-            df.columns = ['lat', 'lon']
+            df = issDf#[['latitude','longitude']]
+            df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
+            'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
+            'visibility']
+            
+            #Get projected chart space X's and Y's from the projection func which adds them to the dataframe
             df = df.apply(eqAzProjection,args=(userLat,height),axis=1)
-            df[:]['y_raw']= (df[:]['y_raw'])
-            df[:]['x_raw']= (df[:]['x_raw'])
-            df[:]['y']=  df[:]['y'].astype(int)
-            df[:]['x']=  df[:]['x'].astype(int)
+            
+            #check to see if coordinate overruns boundary of chart and set to NaN
+            #so the ISS path won't bleed over into the chart beside it. 
+            if userLat >= 35:
+                df.loc[df.eval('x<=500'), 'keepx'] = df.x
+                df.loc[df.eval('x<=500'), 'keepy'] = df.y
+
+            else:
+                df.loc[df.eval('x >=-500'), 'keepx'] = df.x
+                df.loc[df.eval('x>=-500'),'keepy'] = df.y
+            df['x'] = df['keepx']
+            df['y'] = df['keepy']
+            df.drop(['keepx', 'keepy'], axis=1)
             return df
 
         def eqAzProjection(s , userLat, height):
@@ -210,7 +226,7 @@ class getDisplay(Resource):
         c.toolbar_location = None
         c.axis.visible = False
         c.border_fill_color = '#000000'
-        
+
         # output_notebook(hide_banner=True)
         # p = show(row(n, s))
         # p = row(n,s)
