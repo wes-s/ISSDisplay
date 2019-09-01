@@ -215,6 +215,7 @@ class getDisplay(Resource):
         # output_notebook(hide_banner=True)
         # p = show(row(n, s))
         # p = row(n,s)
+        c.border_fill_color = '#000000'
         script, div = components(c)
         return make_response(render_template('index.html', script=script, div=div))
 
