@@ -185,37 +185,37 @@ class getDisplay(Resource):
         corners = getCorners()
         iss = getISS()
 
+        c = figure(width = 1000, height = 500, x_range =(-1000, 1000), y_range=(-500, 500))
         ###NORTHERN HEMISPHERE
-        n = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
-        n.image_rgba(image=[northNight], x =-500, y=-500, dh =1000, dw=1000)
-        n.image_rgba(image=[northLights], x =-500, y=-500, dh =1000, dw=1000)
-        n.image_rgba(image=[northDay], x =-500, y=-500, dh =1000, dw=1000)
-        n.line(northISSdf.x, northISSdf.y, color="blue", line_dash=[10,5], line_width=2)
-        n.circle(northISSdf.loc[5]['x'], northISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
-        n.image_rgba(image=[iss], x=northISSdf.loc[5]['x']-40, y = northISSdf.loc[5]['y']-40, dh =80, dw=80)
-        n.image_rgba(image=[corners], x =-500, y=-500, dh =1000, dw=1000)
-        n.background_fill_color = "#000000"
-        n.toolbar_location = None
-        n.axis.visible = False
+        # n = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
+        c.image_rgba(image=[northNight], x =-1000, y=-500, dh =1000, dw=1000)
+        c.image_rgba(image=[northLights], x =-1000, y=-500, dh =1000, dw=1000)
+        c.image_rgba(image=[northDay], x =-1000, y=-500, dh =1000, dw=1000)
+        c.line(northISSdf.x-500, northISSdf.y, color="blue", line_dash=[10,5], line_width=2)
+        c.circle(northISSdf.loc[5]['x']-500, northISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
+        c.image_rgba(image=[iss], x=northISSdf.loc[5]['x']-540, y = northISSdf.loc[5]['y']-40, dh =80, dw=80)
+        c.image_rgba(image=[corners], x =-1000, y=-500, dh =1000, dw=1000)
+        c.background_fill_color = "#000000"
+        c.toolbar_location = None
+        c.axis.visible = False
 
         ###SOUTHERN HEMISPHERE
-        s = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
-        s.image_rgba(image=[southNight], x =-500, y=-500, dh =1000, dw=1000)
-        s.image_rgba(image=[southLights], x =-500, y=-500, dh =1000, dw=1000)
-        s.image_rgba(image=[southDay], x =-500, y=-500, dh =1000, dw=1000)
-        s.line(southISSdf.x, southISSdf.y, color="blue", line_dash=[10,5], line_width=2)
-        s.circle(southISSdf.loc[5]['x'], southISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
-        s.image_rgba(image=[iss], x=southISSdf.loc[5]['x']-40, y = southISSdf.loc[5]['y']-40, dh =80, dw=80)
-        s.image_rgba(image=[corners], x =-500, y=-500, dh =1000, dw=1000)
-        s.background_fill_color = "#000000"
-        s.toolbar_location = None
-        s.axis.visible = False
+        # s = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
+        c.image_rgba(image=[southNight], x =0, y=-500, dh =1000, dw=1000)
+        c.image_rgba(image=[southLights], x =0, y=-500, dh =1000, dw=1000)
+        c.image_rgba(image=[southDay], x =0, y=-500, dh =1000, dw=1000)
+        c.line(southISSdf.x+500, southISSdf.y, color="blue", line_dash=[10,5], line_width=2)
+        c.circle(southISSdf.loc[5]['x']+500, southISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
+        c.image_rgba(image=[iss], x=southISSdf.loc[5]['x']+460, y = southISSdf.loc[5]['y']-40, dh =80, dw=80)
+        c.image_rgba(image=[corners], x =0, y=-500, dh =1000, dw=1000)
+        c.background_fill_color = "#000000"
+        c.toolbar_location = None
+        c.axis.visible = False
 
         # output_notebook(hide_banner=True)
         # p = show(row(n, s))
-
-        p = show(row(n,s))
-        script, div = components(p)
+        # p = row(n,s)
+        script, div = components(c)
         return make_response(render_template('index.html', script=script, div=div))
 
 api.add_resource(getDisplay,"/getDisplay/<string:settings>")
