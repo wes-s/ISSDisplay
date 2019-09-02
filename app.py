@@ -16,7 +16,8 @@ app = Flask(__name__)
 api = Api(app)
 
 class getDisplay(Resource):
-    def get(self, settings):
+    # def get(self, settings):
+    def get(self):
         def getSunList(userLat, height):
             lat1 = 0.0
             lon1 = 0.0
@@ -247,7 +248,9 @@ class getDisplay(Resource):
         script, div = components(c)
         return make_response(render_template('index.html', script=script, div=div))
 
-api.add_resource(getDisplay,"/getDisplay/<string:settings>")
+# api.add_resource(getDisplay,"/getDisplay/<string:settings>")
+api.add_resource(getDisplay)
+
 
 # run.py in local werkzeug simple server when locally testing
 if __name__ == "__main__":
