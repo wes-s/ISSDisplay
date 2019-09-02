@@ -106,8 +106,8 @@ class getDisplay(Resource):
                 lZero = math.radians(0)
             c = math.acos(math.sin(t1)*math.sin(radLat)+math.cos(t1)*math.cos(radLat)*math.cos(radLon-lZero))
             k = c/math.sin(c)
-            s['x'] = (k*math.cos(radLat)*(math.sin(radLon-lZero)))*(height/1.95)
-            s['y'] = (k*(math.cos(t1)*math.sin(radLat)-math.sin(t1)*math.cos(radLat)*math.cos(radLon-lZero)))*(height/1.95)
+            s['x'] = (k*math.cos(radLat)*(math.sin(radLon-lZero)))*(height/1.67)
+            s['y'] = (k*(math.cos(t1)*math.sin(radLat)-math.sin(t1)*math.cos(radLat)*math.cos(radLon-lZero)))*(height/1.67)
             s['x_raw'] = (k*math.cos(radLat)*(math.sin(radLon-lZero)))
             s['y_raw'] = (k*(math.cos(t1)*math.sin(radLat)-math.sin(t1)*math.cos(radLat)*math.cos(radLon-lZero)))
             return s
@@ -125,7 +125,7 @@ class getDisplay(Resource):
             draw = ImageDraw.Draw(imFilter)
             draw.polygon(tuples, fill=(0,150,100))
 
-            imFilter = imFilter.filter(ImageFilter.GaussianBlur(15))
+            imFilter = imFilter.filter(ImageFilter.GaussianBlur(10))
             if userLat >= 0:
                 imFilter.transpose(Image.FLIP_TOP_BOTTOM)
             else:
@@ -208,8 +208,8 @@ class getDisplay(Resource):
         southDay = getDay(-userLat,height)
         northNight = getNight(userLat)
         southNight = getNight(-userLat)
-        northLights = getLights(userLat)
-        southLights = getLights(-userLat)
+        # northLights = getLights(userLat)
+        # southLights = getLights(-userLat)
         corners = getCorners()
         iss = getISS()
         text = 'Lat:'+str(round(northISSdf.loc[5]['lat'],2))\
@@ -224,9 +224,8 @@ class getDisplay(Resource):
         c.title.text_font_size = "12px"
         c.title.background_fill_color = "black"
         ###NORTHERN HEMISPHERE
-        # n = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
         c.image_rgba(image=[northNight], x =-1000, y=-500, dh =1000, dw=1000)
-        c.image_rgba(image=[northLights], x =-1000, y=-500, dh =1000, dw=1000)
+        # c.image_rgba(image=[northLights], x =-1000, y=-500, dh =1000, dw=1000)
         c.image_rgba(image=[northDay], x =-1000, y=-500, dh =1000, dw=1000)
         c.line(northISSdf.x-500, northISSdf.y, color="blue", line_dash=[10,5], line_width=2)
         c.circle(northISSdf.loc[5]['x']-500, northISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
@@ -234,9 +233,8 @@ class getDisplay(Resource):
         c.image_rgba(image=[corners], x =-1000, y=-500, dh =1000, dw=1000)
 
         ###SOUTHERN HEMISPHERE
-        # s = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
         c.image_rgba(image=[southNight], x =0, y=-500, dh =1000, dw=1000)
-        c.image_rgba(image=[southLights], x =0, y=-500, dh =1000, dw=1000)
+        # c.image_rgba(image=[southLights], x =0, y=-500, dh =1000, dw=1000)
         c.image_rgba(image=[southDay], x =0, y=-500, dh =1000, dw=1000)
         c.line(southISSdf.x+500, southISSdf.y, color="blue", line_dash=[10,5], line_width=2)
         c.circle(southISSdf.loc[5]['x']+500, southISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
