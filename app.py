@@ -135,20 +135,14 @@ class getDisplay(Resource):
 
             # read image as RGB and add alpha (transparency)
             if userLat >=0:
-                #GOOD FOR SUMMER N-HEM
-                im = Image.open('images/north_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)    
+                #GOOD FOR SUMMER and WINTER N-HEM
+                im = Image.open('Images/north_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)    
             else:
-                #GOOD FOR WINTER S-HEM
-                im = Image.open('images/south_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                #GOOD FOR WINTER and SUMMER S-HEM
+                im = Image.open('Images/south_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
 
             # convert to numpy (for convenience)
             imArray = np.asarray(im)
-
-            # create mask
-            # polygon = tuples # [(100,100), (200,100), (150,150)]
-            # maskIm = Image.new('L', (imArray.shape[0], imArray.shape[1]), 0)
-            # ImageDraw.Draw(maskIm).polygon(polygon, outline=0, fill=1)
-            # mask = np.array(maskIm)
 
             # assemble new image (uint8: 0-255)
             newImArray = np.empty(imArray.shape,dtype='uint8')
