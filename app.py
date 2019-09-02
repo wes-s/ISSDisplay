@@ -205,8 +205,17 @@ class getDisplay(Resource):
         southLights = getLights(-userLat)
         corners = getCorners()
         iss = getISS()
+        text = 'Lat:'+str(round(northISSdf.loc[5]['lat'],2))\
+        +' Lon:'+str(round(northISSdf.loc[5]['lon'],2))\
+        +'\r\nAltitude:'+str(round(northISSdf.loc[5]['altitude'],2))+' '+str(northISSdf.loc[5]['units'])\
+        +'\r\nSpeed:'+str(round(northISSdf.loc[5]['velocity'],2))+' '+str(northISSdf.loc[5]['units']+' per hour')
 
         c = figure(width = 1000, height = 500, x_range =(-1000, 1000), y_range=(-500, 500))
+        c.title.text = text
+        c.title.align = "center"
+        c.title.text_color = "white"
+        c.title.text_font_size = "12px"
+        c.title.background_fill_color = "black"
         ###NORTHERN HEMISPHERE
         # n = figure(width=500, height=500,x_range=(-500,500), y_range=(-500,500))
         c.image_rgba(image=[northNight], x =-1000, y=-500, dh =1000, dw=1000)
