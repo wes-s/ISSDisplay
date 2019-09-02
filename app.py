@@ -249,7 +249,7 @@ class getDisplay(Resource):
         return make_response(render_template('index.html', script=script, div=div))
 
 # api.add_resource(getDisplay,"/getDisplay/<string:settings>")
-api.add_resource(getDisplay)
+api.add_resource(getDisplay,"/getDisplay")
 
 
 # run.py in local werkzeug simple server when locally testing
