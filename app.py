@@ -113,6 +113,7 @@ class getDisplay(Resource):
             return s
 
         def getDay(userLat, height):
+            dayOfYear = float(datetime.utcnow().timetuple().tm_yday)
             sunList = getSunList(userLat,height)
             subset = sunList[['x', 'y']]
             subset[:]['x']=subset[:]['x']+500
@@ -134,11 +135,11 @@ class getDisplay(Resource):
 
             # read image as RGB and add alpha (transparency)
             if userLat >=0:
-                im = Image.open('Images/north_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                #GOOD FOR SUMMER N-HEM
+                im = Image.open('images/north_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)    
             else:
-                im = Image.open('Images/south_day.png').convert('RGBA').transpose(Image.FLIP_LEFT_RIGHT)
-
-                # im = day.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                #GOOD FOR WINTER S-HEM
+                im = Image.open('images/south_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
 
             # convert to numpy (for convenience)
             imArray = np.asarray(im)
@@ -157,13 +158,24 @@ class getDisplay(Resource):
 
             # transparency (4th column)
             # newImArray[:,:,3] = mask*255
-            newImArray[:,:,3] = imFilterArray[:,:,3]
-
-            # back to Image from numpy
-            if userLat >=0:
-                newIm = Image.fromarray(newImArray, "RGBA")
+            if userLat >= 0:
+                if dayOfYear <=78 or dayOfYear >=266:
+                    #winter northern-hemisphere
+                    newImArray[:,:,3] = 255-imFilterArray[:,:,3]
+                else:
+                    #summer southern-hemisphere
+                    newImArray[:,:,3] = imFilterArray[:,:,3]
             else:
-                newIm = Image.fromarray(newImArray, "RGBA").transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.FLIP_TOP_BOTTOM)
+                if dayOfYear >=78 and dayOfYear <=266:
+                    #winter southern-hemisphere
+                    newImArray[:,:,3] = 255-imFilterArray[:,:,3]
+                else:
+                    #summer southern-hemisphere
+                    newImArray[:,:,3] = imFilterArray[:,:,3]
+
+
+            newIm = Image.fromarray(newImArray, "RGBA")
+            # back to Image from numpy
             finalImArray = np.array(newIm)
             return finalImArray
 
