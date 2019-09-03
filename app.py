@@ -68,7 +68,7 @@ class getDisplay(Resource):
 
             response = requests.get(url)
             if response:
-                issDf = pd.read_json(response.content)
+                df = pd.read_json(response.content)
             df = issDf#[['latitude','longitude']]
             df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
             'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
@@ -92,7 +92,7 @@ class getDisplay(Resource):
             df['x'] = df['keepx']
             df['y'] = df['keepy']
             df.drop(['keepx'], axis=1)
-            df.drop(['keepy'],axis=1)    
+            df.drop(['keepy'], axis=1)    
             return df
 
         def eqAzProjection(s , userLat, height):
@@ -212,10 +212,18 @@ class getDisplay(Resource):
         # southLights = getLights(-userLat)
         corners = getCorners()
         iss = getISS()
-        text = 'Lat:'+str(round(northISSdf.loc[5]['lat'],2))\
-        +' Lon:'+str(round(northISSdf.loc[5]['lon'],2))\
-        +'\r\nAltitude:'+str(round(northISSdf.loc[5]['altitude'],2))+' '+str(northISSdf.loc[5]['units'])\
-        +'\r\nSpeed:'+str(round(northISSdf.loc[5]['velocity'],2))+' '+str(northISSdf.loc[5]['units']+' per hour')
+        if not np.isnan(northISSdf.loc[5]['x']):
+            text = 'Lat:'+str(round(northISSdf.loc[5]['lat'],2))\
+                    +' Lon:'+str(round(northISSdf.loc[5]['lon'],2))\
+                    +'\r\nAltitude:'+str(round(northISSdf.loc[5]['altitude'],2))+' '+str(northISSdf.loc[5]['units'])\
+                    +'\r\nSpeed:'+str(round(northISSdf.loc[5]['velocity'],2))+' '+str(northISSdf.loc[5]['units']+' per hour')
+        elif not np.isnan(southISSdf.loc[5]['x']):
+            text = 'Lat:'+str(round(southISSdf.loc[5]['lat'],2))\
+                +' Lon:'+str(round(southISSdf.loc[5]['lon'],2))\
+                +'\r\nAltitude:'+str(round(southISSdf.loc[5]['altitude'],2))+' '+str(southISSdf.loc[5]['units'])\
+                +'\r\nSpeed:'+str(round(southISSdf.loc[5]['velocity'],2))+' '+str(southISSdf.loc[5]['units']+' per hour')
+        else:
+            text = ''
 
         c = figure(width = 1000, height = 500, x_range =(-1000, 1000), y_range=(-500, 500))
         c.title.text = text
@@ -227,18 +235,20 @@ class getDisplay(Resource):
         c.image_rgba(image=[northNight], x =-1000, y=-500, dh =1000, dw=1000)
         # c.image_rgba(image=[northLights], x =-1000, y=-500, dh =1000, dw=1000)
         c.image_rgba(image=[northDay], x =-1000, y=-500, dh =1000, dw=1000)
-        c.line(northISSdf.x-500, northISSdf.y, color="blue", line_dash=[10,5], line_width=2)
-        c.circle(northISSdf.loc[5]['x']-500, northISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
-        c.image_rgba(image=[iss], x=northISSdf.loc[5]['x']-540, y = northISSdf.loc[5]['y']-40, dh =80, dw=80)
+        c.line(northISSdf.x-500, northISSdf.y, color="white", line_dash=[10,5], line_width=2, line_alpha = .4)
+        if not np.isnan(northISSdf.loc[5]['x']):
+            c.circle(northISSdf.loc[5]['x']-500, northISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
+            c.image_rgba(image=[iss], x=northISSdf.loc[5]['x']-540, y = northISSdf.loc[5]['y']-40, dh =80, dw=80)
         c.image_rgba(image=[corners], x =-1000, y=-500, dh =1000, dw=1000)
 
         ###SOUTHERN HEMISPHERE
         c.image_rgba(image=[southNight], x =0, y=-500, dh =1000, dw=1000)
         # c.image_rgba(image=[southLights], x =0, y=-500, dh =1000, dw=1000)
         c.image_rgba(image=[southDay], x =0, y=-500, dh =1000, dw=1000)
-        c.line(southISSdf.x+500, southISSdf.y, color="blue", line_dash=[10,5], line_width=2)
-        c.circle(southISSdf.loc[5]['x']+500, southISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
-        c.image_rgba(image=[iss], x=southISSdf.loc[5]['x']+460, y = southISSdf.loc[5]['y']-40, dh =80, dw=80)
+        c.line(southISSdf.x+500, southISSdf.y, color="white", line_dash=[10,5], line_width=2, line_alpha = .4)
+        if not np.isnan(southISSdf.loc[5]['x']):
+            c.circle(southISSdf.loc[5]['x']+500, southISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
+            c.image_rgba(image=[iss], x=southISSdf.loc[5]['x']+460, y = southISSdf.loc[5]['y']-40, dh =80, dw=80)
         c.image_rgba(image=[corners], x =0, y=-500, dh =1000, dw=1000)
         
         c.background_fill_color = "#000000"
