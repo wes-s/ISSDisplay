@@ -69,7 +69,7 @@ class getDisplay(Resource):
             response = requests.get(url)
             if response:
                 df = pd.read_json(response.content)
-            df = issDf#[['latitude','longitude']]
+            # df = issDf#[['latitude','longitude']]
             df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
             'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
             'visibility']
