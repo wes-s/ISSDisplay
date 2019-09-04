@@ -8,4 +8,4 @@ pandas==0.24.2
 numpy==1.13.3
 Pillow==4.2.1
 json5==0.8.5
-selenium==3.141.0
+pyephem==3.7.7.0

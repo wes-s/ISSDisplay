@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw, ImageFilter
 import numpy as np
 import requests
 import json
+import ephem
 
 app = Flask(__name__)
 api = Api(app)
@@ -19,6 +20,18 @@ api = Api(app)
 class getDisplay(Resource):
     # def get(self, settings):
     def get(self):
+        def dmsToDecDeg(dms):
+            deg = float(dms[0])
+            min = float(dms[1])/60
+            sec = float(dms[2])/3600 
+            if deg <0:
+                decDeg = deg - min - sec
+            else:
+                decDeg = float(dms[0])+ float(dms[1])/60 + float(dms[2])/3600
+            if decDeg > 180:
+                decDeg = 180-decDeg
+            return decDeg
+
         def getSunList(userLat, height):
             lat1 = 0.0
             lon1 = 0.0
@@ -50,6 +63,56 @@ class getDisplay(Resource):
                 brng = brng+5.0
             df = pd.DataFrame.from_dict(sunList, orient='index')
             df = df.apply(eqAzProjection,args=(userLat,height),axis=1)
+            return df
+
+        def getMoonList(userLat, height):
+            home = ephem.Observer()
+            if userLat >= 0:
+                home.lat, home.lon = 90, 0 
+            else:
+                home.lat, home.lon = -90, 0 
+            home.date = datetime.utcnow()
+
+            moon = ephem.Moon()
+            moon.compute(home)
+
+            lat1= dmsToDecDeg(str(moon.dec).split(':'))
+            lon1= dmsToDecDeg(str(moon.az).split(':'))
+
+            d = 10001.0
+            R = 6371.0
+            brng = 0.0
+
+            moonList = {}
+            for i in range(0,73):
+                lat2=round(math.degrees(math.asin(math.sin(lat1)*math.cos(d/R)+math.cos(lat1)*math.sin(d/R)*math.cos(math.radians(brng)))),5)
+                lon2=round(math.degrees(lon1+math.atan2(math.sin(math.radians(brng))*math.sin(d/R)*math.cos(lat1),math.cos(d/R)-math.sin(lat1)*math.sin(math.radians(lat2)))),5)
+                if lon2<-180:
+                    lon2=lon2+360
+                point = {'lat':lat2,'lon':lon2}
+                moonList.update({i:point})
+                brng = brng+5.0
+            df = pd.DataFrame.from_dict(moonList, orient='index')
+            df = df.apply(eqAzProjection,args=(userLat,height),axis=1)
+            return df
+
+        def getMoonLocation(userLat, height):
+            home = ephem.Observer()
+            if userLat >= 0:
+                home.lat, home.lon = -90, 0 
+            else:
+                home.lat, home.lon = -90, 0
+
+            home.date = datetime.utcnow()
+
+            moon = ephem.Moon()
+            moon.compute(home)
+
+            lat1= dmsToDecDeg(str(moon.dec).split(':'))
+            lon1= dmsToDecDeg(str(moon.az).split(':'))
+            point =  {0:{'lat':lat1,'lon':lon1}}
+            df = pd.DataFrame.from_dict(point, orient='index')
+            df = df.apply(eqAzProjection,args=(userLat, height), axis=1)
             return df
 
         def getISSList():
@@ -174,14 +237,6 @@ class getDisplay(Resource):
             finalImArray = np.array(newIm)
             return finalImArray
 
-        def getLights(userLat):
-            if userLat >= 0:
-                im = Image.open('Images/north_lights.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
-            else:
-                im = Image.open('Images/south_lights.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
-            imArray = np.array(im)
-            return imArray
-
         def getNight(userLat):
             if userLat >= 0:
                 im = Image.open('Images/north_night.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
@@ -202,17 +257,22 @@ class getDisplay(Resource):
 
         userLat = 35 
         height = 500
+        width = height*2
         issList = getISSList()
-        northISSdf = projectISSdf(issList, userLat, height)
-        southISSdf = projectISSdf(issList, -userLat,height)
+        # northISSdf = projectISSdf(issList, userLat, height)
+        # southISSdf = projectISSdf(issList, -userLat,height)
         northDay = getDay(userLat,height)
         southDay = getDay(-userLat,height)
         northNight = getNight(userLat)
         southNight = getNight(-userLat)
-        # northLights = getLights(userLat)
-        # southLights = getLights(-userLat)
         corners = getCorners()
         iss = getISS()
+        northMoonDf = getMoonList(userLat, height)
+        southMoonDf = getMoonList(-userLat, height)
+        northMoon = getMoonLocation(userLat, height)
+        southMoon = getMoonLocation(-userLat, height)
+        moon = getMoon()
+
         if not np.isnan(northISSdf.loc[5]['x']):
             text = 'Lat:'+str(round(northISSdf.loc[5]['lat'],2))\
                     +' Lon:'+str(round(northISSdf.loc[5]['lon'],2))\
@@ -226,32 +286,37 @@ class getDisplay(Resource):
         else:
             text = ''
 
-        c = figure(width = 1000, height = 500, x_range =(-1000, 1000), y_range=(-500, 500))
+        c = figure(width = width, height = height, x_range =(-width, width), y_range=(-height,height))
         c.title.text = text
         c.title.align = "center"
         c.title.text_color = "white"
         c.title.text_font_size = "12px"
         c.title.background_fill_color = "black"
+
         ###NORTHERN HEMISPHERE
-        c.image_rgba(image=[northNight], x =-1000, y=-500, dh =1000, dw=1000)
-        # c.image_rgba(image=[northLights], x =-1000, y=-500, dh =1000, dw=1000)
-        c.image_rgba(image=[northDay], x =-1000, y=-500, dh =1000, dw=1000)
-        c.line(northISSdf.x-500, northISSdf.y, color="white", line_dash=[10,5], line_width=2, line_alpha = .4)
+        c.image_rgba(image=[northNight], x =-width, y=-height, dh =width, dw=width)
+        c.image_rgba(image=[northDay], x =-width, y=-height, dh =width, dw=width)
+        c.line(northISSdf.x-height, northISSdf.y, color="blue", line_dash=[10,5], line_width=2)
         if not np.isnan(northISSdf.loc[5]['x']):
-            c.circle(northISSdf.loc[5]['x']-500, northISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
-            c.image_rgba(image=[iss], x=northISSdf.loc[5]['x']-540, y = northISSdf.loc[5]['y']-40, dh =80, dw=80)
-        c.image_rgba(image=[corners], x =-1000, y=-500, dh =1000, dw=1000)
+            c.circle(northISSdf.loc[5]['x']-height, northISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
+            c.image_rgba(image=[iss], x=northISSdf.loc[5]['x']-height-40, y = northISSdf.loc[5]['y']-40, dh =80, dw=80)
+        if not np.isnan(northMoon.loc[0]['x']):
+            c.image_rgba(image=[moon], x=northMoon.loc[0]['x']-height-50, y = northMoon.loc[0]['y']-50, dh =80, dw=100)
+        c.image_rgba(image=[corners], x =-width, y=-height, dh =width, dw=width)
+        c.background_fill_color = "#000000"
+        c.toolbar_location = None
+        c.axis.visible = False
 
         ###SOUTHERN HEMISPHERE
-        c.image_rgba(image=[southNight], x =0, y=-500, dh =1000, dw=1000)
-        # c.image_rgba(image=[southLights], x =0, y=-500, dh =1000, dw=1000)
-        c.image_rgba(image=[southDay], x =0, y=-500, dh =1000, dw=1000)
-        c.line(southISSdf.x+500, southISSdf.y, color="white", line_dash=[10,5], line_width=2, line_alpha = .4)
+        c.image_rgba(image=[southNight], x =0, y=-height, dh =width, dw=width)
+        c.image_rgba(image=[southDay], x =0, y=-height, dh =width, dw=width)
+        c.line(southISSdf.x+500, southISSdf.y, color="blue", line_dash=[10,5], line_width=2)
         if not np.isnan(southISSdf.loc[5]['x']):
-            c.circle(southISSdf.loc[5]['x']+500, southISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
-            c.image_rgba(image=[iss], x=southISSdf.loc[5]['x']+460, y = southISSdf.loc[5]['y']-40, dh =80, dw=80)
-        c.image_rgba(image=[corners], x =0, y=-500, dh =1000, dw=1000)
-        
+            c.circle(southISSdf.loc[5]['x']+height, southISSdf.loc[5]['y'], color="purple", size=35, alpha = 0.5)
+            c.image_rgba(image=[iss], x=southISSdf.loc[5]['x']+height-40, y = southISSdf.loc[5]['y']-40, dh =80, dw=80)
+        if not np.isnan(southMoon.loc[0]['x']):
+            c.image_rgba(image=[moon], x=southMoon.loc[0]['x']+height-50, y = southMoon.loc[0]['y']-50, dh =100, dw=100)
+        c.image_rgba(image=[corners], x =0, y=-height, dh =width, dw=width)
         c.background_fill_color = "#000000"
         c.toolbar_location = None
         c.axis.visible = False
