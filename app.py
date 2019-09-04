@@ -264,8 +264,8 @@ class getDisplay(Resource):
         height = 500
         width = height*2
         issList = getISSList()
-        # northISSdf = projectISSdf(issList, userLat, height)
-        # southISSdf = projectISSdf(issList, -userLat,height)
+        northISSdf = projectISSdf(issList, userLat, height)
+        southISSdf = projectISSdf(issList, -userLat,height)
         northDay = getDay(userLat,height)
         southDay = getDay(-userLat,height)
         northNight = getNight(userLat)
