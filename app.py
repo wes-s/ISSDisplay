@@ -255,6 +255,11 @@ class getDisplay(Resource):
             imArray = np.array(im)
             return imArray
 
+        def getMoon():
+            im = Image.open('Images/moon.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            imArray = np.array(im)
+            return imArray
+
         userLat = 35 
         height = 500
         width = height*2
