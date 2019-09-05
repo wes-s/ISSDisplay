@@ -256,7 +256,45 @@ class getDisplay(Resource):
             return imArray
 
         def getMoon():
-            im = Image.open('Images/moon.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            now = datetime.now()
+            now.year
+            tau = 2.0 * ephem.pi
+        
+            sun = ephem.Sun()
+            moon = ephem.Moon()
+            names = ['Waxing Crescent', 'Waxing Gibbous','Waning Gibbous', 'Waning Crescent']
+            #for n in range(1, 31):
+            s = '{}/{}/{}'.format(now.year, now.month, now.day)# n)
+            sun.compute(s)
+            moon.compute(s)
+        
+            sunlon = ephem.Ecliptic(sun).lon
+            moonlon = ephem.Ecliptic(moon).lon
+        
+            angle = (moonlon - sunlon) % tau
+            deg = round(float(math.degrees(angle)))
+            quarterIdx = int(angle * 4.0 // tau)
+        
+            if 175.0 <= deg <= 185.0:
+                quarterName = 'Full'
+            elif deg>= 355.0 or deg <=5.0:
+                quarterName = 'New'
+            else:
+                quarterName = names[quarterIdx]
+            
+            if quarterName == 'Full':
+                im = Image.open('Images/moon_full.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            elif quarterName == 'New':
+                im = Image.open('Images/moon_new.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            elif quarterName == 'Waxing Crescent':
+                im = Image.open('Images/moon_waxing_crescent.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            elif quarterName == 'Waning Crescent':
+                im = Image.open('Images/moon_waning_crescent.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            elif quarterName == 'Waxing Gibbous':
+                im = Image.open('Images/moon_waxing_gibbous.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            elif quarterName == 'Waning Gibbous':
+                im = Image.open('Images/moon_waning_gibbous.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                
             imArray = np.array(im)
             return imArray
 
