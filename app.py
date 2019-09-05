@@ -24,12 +24,12 @@ class getDisplay(Resource):
             deg = float(dms[0])
             min = float(dms[1])/60
             sec = float(dms[2])/3600 
+            sign = float(np.sign(deg))
+            
             if deg <0:
-                decDeg = deg - min - sec
+                decDeg = math.copysign((math.fabs(deg) + min + sec),deg)
             else:
-                decDeg = float(dms[0])+ float(dms[1])/60 + float(dms[2])/3600
-            if decDeg > 180:
-                decDeg = 180-decDeg
+                decDeg = deg+ min + sec
             return decDeg
 
         def getSunList(userLat, height):
