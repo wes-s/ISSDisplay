@@ -155,11 +155,11 @@ class getDisplay(Resource):
             #check to see if coordinate overruns boundary of chart and set to NaN
             #so the ISS path won't bleed over into the chart beside it. 
             if userLat >= 0:
-                df.loc[df.eval('x<=500'), 'keepx'] = df.x
-                df.loc[df.eval('x<=500'), 'keepy'] = df.y
+                df.loc[df.eval('x<=475'), 'keepx'] = df.x
+                df.loc[df.eval('x<=475'), 'keepy'] = df.y
             else:
-                df.loc[df.eval('x >=-500'), 'keepx'] = df.x
-                df.loc[df.eval('x>=-500'),'keepy'] = df.y
+                df.loc[df.eval('x >=-475'), 'keepx'] = df.x
+                df.loc[df.eval('x>=-475'),'keepy'] = df.y
             df['x'] = df['keepx']
             df['y'] = df['keepy']
             df.drop(['keepx'], axis=1)
@@ -264,7 +264,7 @@ class getDisplay(Resource):
             return imArray
 
         def getISS():
-            im = Image.open('Images/iss.png').transpose(Image.FLIP_TOP_BOTTOM)
+            im = Image.open('Images/iss.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
             imArray = np.array(im)
             return imArray
 
