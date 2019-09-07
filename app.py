@@ -1,18 +1,6 @@
 from flask import Flask, request, render_template, make_response, send_file
 from flask_restful import Api, Resource
-from io import BytesIO
-from datetime import datetime
-import pandas as pd
-from bokeh.palettes import plasma
-from bokeh.plotting import figure, show
-from bokeh.layouts import row, gridplot
 from bokeh.embed import components
-import math
-from PIL import Image, ImageDraw, ImageFilter
-import numpy as np
-import requests
-import json
-import ephem
 from functions import *
 
 app = Flask(__name__)
