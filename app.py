@@ -372,7 +372,7 @@ class getDisplay(Resource):
         c.line(southISSdf.x+height, southISSdf.y, color="purple", line_dash=[10,5], line_width=3)
         c.line(southMoonDf.x+height, southMoonDf.y, color="white", line_dash=[5,15], line_width=1, line_alpha = 0.6)
         if not np.isnan(southISSdf.loc[issIndex]['x']):
-            c.circle(southISSdf.loc[issIndex]['x']+height, southISSdf.loc[issIndex]['y'], color="purple", size=35, alpha = 0.5)
+            c.circle(southISSdf.loc[issIndex]['x']+height, southISSdf.loc[issIndex]['y'], color="purple", size=footprint, alpha = 0.5)
             c.image_rgba(image=[iss], x=southISSdf.loc[issIndex]['x']+height-40, y = southISSdf.loc[issIndex]['y']-40, dh =80, dw=80)
         if not np.isnan(southMoon.loc[0]['x']):
             c.image_rgba(image=[moon], x=southMoon.loc[0]['x']+height-50, y = southMoon.loc[0]['y']-50, dh =100, dw=100)
