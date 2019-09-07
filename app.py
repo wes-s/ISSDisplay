@@ -310,88 +310,93 @@ class getDisplay(Resource):
                 
             imArray = np.array(im)
             return imArray
+        def getChart():
+            userLat = 35 
+            height = 500
+            width = height*2
+            issIndex = 6
+            issList = getISSList()
+            northISSdf = projectISSdf(issList, userLat, height)
+            southISSdf = projectISSdf(issList, -userLat,height)
+            northDay = getDay(userLat,height)
+            southDay = getDay(-userLat,height)
+            northNight = getNight(userLat)
+            southNight = getNight(-userLat)
+            corners = getCorners()
+            iss = getISS()
+            northMoonDf = getMoonList(userLat, height)
+            southMoonDf = getMoonList(-userLat, height)
+            northMoon = getMoonLocation(userLat, height)
+            southMoon = getMoonLocation(-userLat, height)
+            moon = getMoon()
+            footprint = int(2*math.sqrt(((issList.loc[issIndex]['footprint']*width)/height)/math.pi)*1.2)
 
-        userLat = 35 
-        height = 500
-        width = height*2
-        issIndex = 6
-        issList = getISSList()
-        northISSdf = projectISSdf(issList, userLat, height)
-        southISSdf = projectISSdf(issList, -userLat,height)
-        northDay = getDay(userLat,height)
-        southDay = getDay(-userLat,height)
-        northNight = getNight(userLat)
-        southNight = getNight(-userLat)
-        corners = getCorners()
-        iss = getISS()
-        northMoonDf = getMoonList(userLat, height)
-        southMoonDf = getMoonList(-userLat, height)
-        northMoon = getMoonLocation(userLat, height)
-        southMoon = getMoonLocation(-userLat, height)
-        moon = getMoon()
-        footprint = int(2*math.sqrt(((issList.loc[issIndex]['footprint']*width)/height)/math.pi)*1.2)
+            if not np.isnan(northISSdf.loc[issIndex]['x']):
+                text = 'Lat:'+str(round(northISSdf.loc[issIndex]['lat'],2))\
+                        +' Lon:'+str(round(northISSdf.loc[issIndex]['lon'],2))\
+                        +'\r\nAltitude:'+str(round(northISSdf.loc[issIndex]['altitude'],2))+' '+str(northISSdf.loc[5]['units'])\
+                        +'\r\nSpeed:'+str(round(northISSdf.loc[issIndex]['velocity'],2))+' '+str(northISSdf.loc[5]['units']+' per hour')
+            elif not np.isnan(southISSdf.loc[issIndex]['x']):
+                text = 'Lat:'+str(round(southISSdf.loc[issIndex]['lat'],2))\
+                    +' Lon:'+str(round(southISSdf.loc[issIndex]['lon'],2))\
+                    +'\r\nAltitude:'+str(round(southISSdf.loc[issIndex]['altitude'],2))+' '+str(southISSdf.loc[5]['units'])\
+                    +'\r\nSpeed:'+str(round(southISSdf.loc[issIndex]['velocity'],2))+' '+str(southISSdf.loc[5]['units']+' per hour')
+            else:
+                text = ''
 
-        if not np.isnan(northISSdf.loc[issIndex]['x']):
-            text = 'Lat:'+str(round(northISSdf.loc[issIndex]['lat'],2))\
-                    +' Lon:'+str(round(northISSdf.loc[issIndex]['lon'],2))\
-                    +'\r\nAltitude:'+str(round(northISSdf.loc[issIndex]['altitude'],2))+' '+str(northISSdf.loc[5]['units'])\
-                    +'\r\nSpeed:'+str(round(northISSdf.loc[issIndex]['velocity'],2))+' '+str(northISSdf.loc[5]['units']+' per hour')
-        elif not np.isnan(southISSdf.loc[issIndex]['x']):
-            text = 'Lat:'+str(round(southISSdf.loc[issIndex]['lat'],2))\
-                +' Lon:'+str(round(southISSdf.loc[issIndex]['lon'],2))\
-                +'\r\nAltitude:'+str(round(southISSdf.loc[issIndex]['altitude'],2))+' '+str(southISSdf.loc[5]['units'])\
-                +'\r\nSpeed:'+str(round(southISSdf.loc[issIndex]['velocity'],2))+' '+str(southISSdf.loc[5]['units']+' per hour')
-        else:
-            text = ''
+            c = figure(output_backend="webgl", width = width, height = height, x_range =(-width, width), y_range=(-height,height))
+            c.title.text = text
+            c.title.align = "center"
+            c.title.text_color = "white"
+            c.title.text_font_size = "12px"
+            c.title.background_fill_color = "black"
 
-        c = figure(output_backend="webgl", width = width, height = height, x_range =(-width, width), y_range=(-height,height))
-        c.title.text = text
-        c.title.align = "center"
-        c.title.text_color = "white"
-        c.title.text_font_size = "12px"
-        c.title.background_fill_color = "black"
+            ###NORTHERN HEMISPHERE
+            c.image_rgba(image=[northNight], x =-width, y=-height, dh =width, dw=width)
+            c.image_rgba(image=[northDay], x =-width, y=-height, dh =width, dw=width)
+            c.line(northISSdf.x-height, northISSdf.y, color="purple", line_dash=[10,5], line_width=3)
+            c.line(northMoonDf.x-height, northMoonDf.y, color="white", line_dash=[5,15], line_width=1, line_alpha = 0.6)
+            if not np.isnan(northISSdf.loc[issIndex]['x']):
+                c.circle(northISSdf.loc[issIndex]['x']-height, northISSdf.loc[issIndex]['y'], color="purple", size=footprint, alpha = 0.5)
+                c.image_rgba(image=[iss], x=northISSdf.loc[issIndex]['x']-height-40, y = northISSdf.loc[issIndex]['y']-40, dh =80, dw=80)
+            if not np.isnan(northMoon.loc[0]['x']):
+                c.image_rgba(image=[moon], x=northMoon.loc[0]['x']-height-50, y = northMoon.loc[0]['y']-50, dh =80, dw=100)
+            c.image_rgba(image=[corners], x =-width, y=-height, dh =width, dw=width)
+            c.background_fill_color = "#000000"
+            c.toolbar_location = None
+            c.axis.visible = False
 
-        ###NORTHERN HEMISPHERE
-        c.image_rgba(image=[northNight], x =-width, y=-height, dh =width, dw=width)
-        c.image_rgba(image=[northDay], x =-width, y=-height, dh =width, dw=width)
-        c.line(northISSdf.x-height, northISSdf.y, color="purple", line_dash=[10,5], line_width=3)
-        c.line(northMoonDf.x-height, northMoonDf.y, color="white", line_dash=[5,15], line_width=1, line_alpha = 0.6)
-        if not np.isnan(northISSdf.loc[issIndex]['x']):
-            c.circle(northISSdf.loc[issIndex]['x']-height, northISSdf.loc[issIndex]['y'], color="purple", size=footprint, alpha = 0.5)
-            c.image_rgba(image=[iss], x=northISSdf.loc[issIndex]['x']-height-40, y = northISSdf.loc[issIndex]['y']-40, dh =80, dw=80)
-        if not np.isnan(northMoon.loc[0]['x']):
-            c.image_rgba(image=[moon], x=northMoon.loc[0]['x']-height-50, y = northMoon.loc[0]['y']-50, dh =80, dw=100)
-        c.image_rgba(image=[corners], x =-width, y=-height, dh =width, dw=width)
-        c.background_fill_color = "#000000"
-        c.toolbar_location = None
-        c.axis.visible = False
+            ###SOUTHERN HEMISPHERE
+            c.image_rgba(image=[southNight], x =0, y=-height, dh =width, dw=width)
+            c.image_rgba(image=[southDay], x =0, y=-height, dh =width, dw=width)
+            c.line(southISSdf.x+height, southISSdf.y, color="purple", line_dash=[10,5], line_width=3)
+            c.line(southMoonDf.x+height, southMoonDf.y, color="white", line_dash=[5,15], line_width=1, line_alpha = 0.6)
+            if not np.isnan(southISSdf.loc[issIndex]['x']):
+                c.circle(southISSdf.loc[issIndex]['x']+height, southISSdf.loc[issIndex]['y'], color="purple", size=footprint, alpha = 0.5)
+                c.image_rgba(image=[iss], x=southISSdf.loc[issIndex]['x']+height-40, y = southISSdf.loc[issIndex]['y']-40, dh =80, dw=80)
+            if not np.isnan(southMoon.loc[0]['x']):
+                c.image_rgba(image=[moon], x=southMoon.loc[0]['x']+height-50, y = southMoon.loc[0]['y']-50, dh =100, dw=100)
+            c.image_rgba(image=[corners], x =0, y=-height, dh =width, dw=width)
+            c.background_fill_color = "#000000"
+            c.toolbar_location = None
+            c.axis.visible = False
+            c.border_fill_color = '#000000'
+            c.outline_line_color = None
 
-        ###SOUTHERN HEMISPHERE
-        c.image_rgba(image=[southNight], x =0, y=-height, dh =width, dw=width)
-        c.image_rgba(image=[southDay], x =0, y=-height, dh =width, dw=width)
-        c.line(southISSdf.x+height, southISSdf.y, color="purple", line_dash=[10,5], line_width=3)
-        c.line(southMoonDf.x+height, southMoonDf.y, color="white", line_dash=[5,15], line_width=1, line_alpha = 0.6)
-        if not np.isnan(southISSdf.loc[issIndex]['x']):
-            c.circle(southISSdf.loc[issIndex]['x']+height, southISSdf.loc[issIndex]['y'], color="purple", size=footprint, alpha = 0.5)
-            c.image_rgba(image=[iss], x=southISSdf.loc[issIndex]['x']+height-40, y = southISSdf.loc[issIndex]['y']-40, dh =80, dw=80)
-        if not np.isnan(southMoon.loc[0]['x']):
-            c.image_rgba(image=[moon], x=southMoon.loc[0]['x']+height-50, y = southMoon.loc[0]['y']-50, dh =100, dw=100)
-        c.image_rgba(image=[corners], x =0, y=-height, dh =width, dw=width)
-        c.background_fill_color = "#000000"
-        c.toolbar_location = None
-        c.axis.visible = False
-        c.border_fill_color = '#000000'
-        c.outline_line_color = None
-
-        # output_notebook(hide_banner=True)
-        # p = show(row(n, s))
-        # p = row(n,s)
-        script, div = components(c)
+            # output_notebook(hide_banner=True)
+            # p = show(row(n, s))
+            # p = row(n,s)
+            return c
+        script, div = components(getChart())
         return make_response(render_template('index.html', script=script, div=div))
 
 # api.add_resource(getDisplay,"/getDisplay/<string:settings>")
 api.add_resource(getDisplay,"/getDisplay")
 
+@app.route('/background_refresh')
+def background_process_test():
+    print("Hello")
+    return "nothing"
 
 # run.py in local werkzeug simple server when locally testing
 if __name__ == "__main__":
