@@ -129,8 +129,8 @@ class getDisplay(Resource):
             now = datetime.timestamp(datetime.now())
             
             #start in the past 18 minutes
-            stamp = int(now - (now%60)-1080);
-            url = "https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps="+ str(stamp)+",";
+            stamp = int(now - (now%60)-1080)
+            url = "https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps="+ str(stamp)+","
             
             #append 35 more timestamps separated by 3 minutes each to the request URL
             for i in range(1,35):
@@ -187,14 +187,14 @@ class getDisplay(Resource):
             dayOfYear = float(datetime.utcnow().timetuple().tm_yday)
             sunList = getSunList(userLat,height)
             subset = sunList[['x', 'y']]
-            subset[:]['x']=subset[:]['x']+500
-            subset[:]['y']=subset[:]['y']+500
+            subset[:]['x']=subset[:]['x']+250
+            subset[:]['y']=subset[:]['y']+250
 
             tuples = [tuple(x) for x in subset.values]
 
-            imFilter = Image.new('RGBA', (1000, 1000), (0, 0, 0, 0))
+            imFilter = Image.new('RGBA', (500, 500), (0, 0, 0, 0))
             draw = ImageDraw.Draw(imFilter)
-            draw.polygon(tuples, fill=(0,150,100))
+            draw.polygon(tuples, fill=(0,0,0))
 
             imFilter = imFilter.filter(ImageFilter.GaussianBlur(10))
             if userLat >= 0:
@@ -207,10 +207,10 @@ class getDisplay(Resource):
             # read image as RGB and add alpha (transparency)
             if userLat >=0:
                 #GOOD FOR SUMMER N-HEM
-                im = Image.open('Images/north_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)    
+                im = Image.open('Images/north_day.png').transpose(Image.FLIP_TOP_BOTTOM)    
             else:
                 #GOOD FOR WINTER S-HEM
-                im = Image.open('Images/south_day.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/south_day.png').transpose(Image.FLIP_TOP_BOTTOM)
 
             # convert to numpy (for convenience)
             imArray = np.asarray(im)
@@ -252,19 +252,19 @@ class getDisplay(Resource):
 
         def getNight(userLat):
             if userLat >= 0:
-                im = Image.open('Images/north_night.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/north_night.png').transpose(Image.FLIP_TOP_BOTTOM)
             else:
-                im = Image.open('Images/south_night.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/south_night.png').transpose(Image.FLIP_TOP_BOTTOM)
             imArray = np.array(im)
             return imArray
 
         def getCorners():
-            im = Image.open('Images/corners.png').convert('RGBA')
+            im = Image.open('Images/corners.png')
             imArray = np.array(im)
             return imArray
 
         def getISS():
-            im = Image.open('Images/iss.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+            im = Image.open('Images/iss.png').transpose(Image.FLIP_TOP_BOTTOM)
             imArray = np.array(im)
             return imArray
 
@@ -296,17 +296,17 @@ class getDisplay(Resource):
                 quarterName = names[quarterIdx]
             
             if quarterName == 'Full':
-                im = Image.open('Images/moon_full.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/moon_full.png').transpose(Image.FLIP_TOP_BOTTOM)
             elif quarterName == 'New':
-                im = Image.open('Images/moon_new.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/moon_new.png').transpose(Image.FLIP_TOP_BOTTOM)
             elif quarterName == 'Waxing Crescent':
-                im = Image.open('Images/moon_waxing_crescent.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/moon_waxing_crescent.png').transpose(Image.FLIP_TOP_BOTTOM)
             elif quarterName == 'Waning Crescent':
-                im = Image.open('Images/moon_waning_crescent.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/moon_waning_crescent.png').transpose(Image.FLIP_TOP_BOTTOM)
             elif quarterName == 'Waxing Gibbous':
-                im = Image.open('Images/moon_waxing_gibbous.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/moon_waxing_gibbous.png').transpose(Image.FLIP_TOP_BOTTOM)
             elif quarterName == 'Waning Gibbous':
-                im = Image.open('Images/moon_waning_gibbous.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+                im = Image.open('Images/moon_waning_gibbous.png').transpose(Image.FLIP_TOP_BOTTOM)
                 
             imArray = np.array(im)
             return imArray
@@ -344,7 +344,7 @@ class getDisplay(Resource):
         else:
             text = ''
 
-        c = figure(width = width, height = height, x_range =(-width, width), y_range=(-height,height))
+        c = figure(output_backend="webgl", width = width, height = height, x_range =(-width, width), y_range=(-height,height))
         c.title.text = text
         c.title.align = "center"
         c.title.text_color = "white"
