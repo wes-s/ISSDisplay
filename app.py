@@ -9,12 +9,15 @@ api = Api(app)
 class getDisplay(Resource):
     # def get(self, settings):
     def get(self):
-        script, div = components(getChart())
+        if request.args:
+            key = request.args.get('key', 0)
+        script, div = components(getChart(key))
         return make_response(render_template('index.html', script=script, div=div))
 
 # api.add_resource(getDisplay,"/getDisplay/<string:settings>")
 api.add_resource(getDisplay,"/getDisplay")
 
+#TODO work on background refresh of chart rather than kill and fill entire page
 @app.route('/background_refresh')
 def background_process_test():
     print("Hello")
