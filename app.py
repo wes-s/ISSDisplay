@@ -9,9 +9,12 @@ api = Api(app)
 class getDisplay(Resource):
     # def get(self, settings):
     def get(self):
+        sats = None
+        key = None
         if request.args:
             key = request.args.get('key', 0)
-        script, div = components(getChart(key))
+            sats = request.args.get('satellites', None)
+        script, div = components(getChart(key), sats)
         return make_response(render_template('index.html', script=script, div=div))
 
 # api.add_resource(getDisplay,"/getDisplay/<string:settings>")

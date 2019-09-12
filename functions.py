@@ -314,11 +314,13 @@ def getN2Y0sat(satId, n2yokey):
     url="https://www.n2yo.com/rest/v1/satellite/positions/"+str(satId)+"/0/0/0/1000&apiKey="+str(n2yokey)
     response = requests.get(url)
     if response:
+        satName = json.loads(response.content.decode("utf-8"))['info']['satname']
         df = pd.DataFrame(json.loads(response.content.decode("utf-8"))['positions'])[['satlatitude', 'satlongitude']]
-    df.columns= ['lat', 'lon']
+        df['satName']= satName
+    df.columns= ['lat', 'lon', 'satName']
     return df
 
-def getChart(n2yokey):
+def getChart(n2yokey, adhoc):
     userLat = 35 
     height = 500
     width = height*2
@@ -375,7 +377,50 @@ def getChart(n2yokey):
     ###NORTHERN HEMISPHERE
     c.image_rgba(image=[northNight], x =-width, y=-height, dh =width, dw=width)
     c.image_rgba(image=[northDay], x =-width, y=-height, dh =width, dw=width)
+
+    ###SOUTHERN HEMISPHERE
+    c.image_rgba(image=[southNight], x =0, y=-height, dh =width, dw=width)
+    c.image_rgba(image=[southDay], x =0, y=-height, dh =width, dw=width)
     
+    ###SATELLITES
+    #ADHOC SAT NORTH AND SOUTH
+    #ADHOC SATS i.e. NOAA19: 33591 ; GOES 15: 36411 ; LANDSAT 8: 39084; 
+    adhocSat = adhoc
+    if adhocSat:
+        adHocNames =[]
+        colorsAdhoc = viridis(len(adhocSat)*2)
+        if len(adhocSat)>0:
+            for num, sat in enumerate(adhocSat, start = 0):
+                colorIndex = num*2
+                adf = getN2Y0sat(sat, "4NVW96-KJDUFT-TX2CWG-476R" )
+                adf = adf[adf.index%100 == 0].reset_index()
+                northAdf = projectDf(adf, userLat, height)
+                southAdf = projectDf(adf, -userLat, height)
+                
+                adHocNames.append(northAdf.loc[0]['satName'])
+                
+                c.line(northAdf.x-height, northAdf.y, color=colorsAdhoc[colorIndex], line_width = 1)#, line_dash=[2,2], line_width=3, line_alpha = 0.9)
+                if not np.isnan(northAdf.loc[0]['x']):
+                    c.triangle(northAdf.x-height
+                            , northAdf.y
+                            , color= colorsAdhoc[colorIndex]
+                            , size = 8
+                            , alpha = 0.9
+                            , angle = northAdf.bearingToNext)
+                    c.circle(northAdf.loc[0]['x']-height, northAdf.loc[0]['y'], color = colorsAdhoc[colorIndex], size=25, alpha = 0.9)
+                    c.image_rgba(image=[hubble], x=northAdf.loc[0]['x']-height-20, y = northAdf.loc[0]['y']-20, dh =40, dw=40)
+
+                c.line(southAdf.x+height, southAdf.y, color= colorsAdhoc[colorIndex] , line_width = 1)#,line_dash=[2,2], line_width=3, line_alpha = 0.9)
+                if not np.isnan(southAdf.loc[0]['x']):
+                    c.triangle(southAdf.x+height
+                        , southAdf.y
+                        , color= colorsAdhoc[colorIndex]
+                        , size = 8
+                        , alpha = 0.9
+                        , angle = southAdf.bearingToNext)
+                    c.circle(southAdf.loc[0]['x']+height, southAdf.loc[0]['y'], color= colorsAdhoc[colorIndex], size=25, alpha = 0.9)
+                    c.image_rgba(image=[hubble], x=southAdf.loc[0]['x']+height-20, y = southAdf.loc[0]['y']-20, dh =40, dw=40)
+
     #ISS NORTH   
     c.line(northISSdf.x-height, northISSdf.y, color="purple", line_width = 1)# line_dash=[10,5], line_width=3)
     if not np.isnan(northISSdf.loc[issIndex]['x']):
@@ -420,14 +465,10 @@ def getChart(n2yokey):
         , size = 5
         , alpha = 0.2
         , angle = northMoonDf.bearingToNext - 1.5708 )
-    if not np.isnan(northMoon.loc[0]['x']):    
+    if not np.isnan(northMoon.loc[0]['x']) and northMoon.loc[0]['x']<500:    
         c.image_rgba(image=[moon], x=northMoon.loc[0]['x']-height-50, y = northMoon.loc[0]['y']-50, dh =80, dw=100)
 
     c.image_rgba(image=[corners], x =-width, y=-height, dh =width, dw=width)
-
-    ###SOUTHERN HEMISPHERE
-    c.image_rgba(image=[southNight], x =0, y=-height, dh =width, dw=width)
-    c.image_rgba(image=[southDay], x =0, y=-height, dh =width, dw=width)
     
     #ISS SOUTH
     c.line(southISSdf.x+height, southISSdf.y, color="purple", line_width = 1) #line_dash=[10,5], line_width=3)
@@ -498,6 +539,17 @@ def getChart(n2yokey):
     c.image_rgba(image=[usa224], x=-980, y = 295, dh =40, dw=40)
     Two24Label = Label(text = '224', x = -910, y = 300, text_color = 'white', text_font_size = "10pt")
     c.add_layout(Two24Label)
+
+    if adhocSat:
+        colorsAdhoc = viridis(len(adhocSat)*2)
+        if len(adhocSat)>0:
+            for num, sat in enumerate(adhocSat, start = 0):
+                colorIndex = num*2
+                y = 435-num*70
+                circle = c.circle(-40, y, color = colorsAdhoc[colorIndex], size=25, alpha = 0.9)
+                image = c.image_rgba(image=[hubble], x=-60, y = y-20, dh =40, dw=40)
+                adHocLabel = Label(text = adHocNames[num], x = -5, y = y-15, text_color = 'white', text_font_size = "8pt")
+                c.add_layout(adHocLabel)
 
 
     # print (northMoon, southMoon)
