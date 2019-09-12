@@ -1,6 +1,6 @@
 from datetime import datetime
 import pandas as pd
-from bokeh.palettes import plasma
+from bokeh.palettes import viridis
 from bokeh.plotting import figure, show, output_notebook
 from bokeh.layouts import row
 from bokeh.embed import components
@@ -314,11 +314,13 @@ def getN2Y0sat(satId, n2yokey):
     url="https://www.n2yo.com/rest/v1/satellite/positions/"+str(satId)+"/0/0/0/1000&apiKey="+str(n2yokey)
     response = requests.get(url)
     if response:
+        satName = json.loads(response.content.decode("utf-8"))['info']['satname']
         df = pd.DataFrame(json.loads(response.content.decode("utf-8"))['positions'])[['satlatitude', 'satlongitude']]
-    df.columns= ['lat', 'lon']
+        df['satName']= satName
+    df.columns= ['lat', 'lon', 'satName']
     return df
 
-def getChart(n2yokey):
+def getChart(n2yokey= None, adhoc=None):
     userLat = 35 
     height = 500
     width = height*2
@@ -342,15 +344,16 @@ def getChart(n2yokey):
     southMoon = getMoonLocation(-userLat, height)
     moon = getMoon()
     footprint = int(2*math.sqrt(((issDf.loc[issIndex]['footprint']*width)/height)/math.pi))
-
-    hubbleDf = getN2Y0sat('20580', n2yokey)
-    hubbleDf = hubbleDf[hubbleDf.index%100 == 0].reset_index()
-    northHubbleDf = projectDf(hubbleDf, userLat, height)
-    southHubbleDf = projectDf(hubbleDf, -userLat, height)
-    TwoTwoFourDf = getN2Y0sat('37348',n2yokey)
-    TwoTwoFourDf = TwoTwoFourDf[TwoTwoFourDf.index%100 == 0].reset_index()
-    north224Df = projectDf(TwoTwoFourDf, userLat, height)
-    south224Df = projectDf(TwoTwoFourDf, -userLat, height)
+    
+    if n2yokey:
+        hubbleDf = getN2Y0sat('20580', n2yokey)
+        hubbleDf = hubbleDf[hubbleDf.index%100 == 0].reset_index()
+        northHubbleDf = projectDf(hubbleDf, userLat, height)
+        southHubbleDf = projectDf(hubbleDf, -userLat, height)
+        TwoTwoFourDf = getN2Y0sat('37348',n2yokey)
+        TwoTwoFourDf = TwoTwoFourDf[TwoTwoFourDf.index%100 == 0].reset_index()
+        north224Df = projectDf(TwoTwoFourDf, userLat, height)
+        south224Df = projectDf(TwoTwoFourDf, -userLat, height)
 
     if not np.isnan(northISSdf.loc[issIndex]['x']):
         text = 'Lat:'+str(round(northISSdf.loc[issIndex]['lat'],2))\
@@ -375,7 +378,50 @@ def getChart(n2yokey):
     ###NORTHERN HEMISPHERE
     c.image_rgba(image=[northNight], x =-width, y=-height, dh =width, dw=width)
     c.image_rgba(image=[northDay], x =-width, y=-height, dh =width, dw=width)
+
+    ###SOUTHERN HEMISPHERE
+    c.image_rgba(image=[southNight], x =0, y=-height, dh =width, dw=width)
+    c.image_rgba(image=[southDay], x =0, y=-height, dh =width, dw=width)
     
+    ###SATELLITES
+    #ADHOC SAT NORTH AND SOUTH
+    #ADHOC SATS i.e. NOAA19: 33591 ; GOES 15: 36411 ; LANDSAT 8: 39084; 
+    adhocSat = adhoc
+    if adhocSat and n2yokey:
+        adHocNames =[]
+        colorsAdhoc = viridis(len(adhocSat)*2)
+        if len(adhocSat)>0:
+            for num, sat in enumerate(adhocSat, start = 0):
+                colorIndex = num*2
+                adf = getN2Y0sat(sat, "4NVW96-KJDUFT-TX2CWG-476R" )
+                adf = adf[adf.index%100 == 0].reset_index()
+                northAdf = projectDf(adf, userLat, height)
+                southAdf = projectDf(adf, -userLat, height)
+                
+                adHocNames.append(northAdf.loc[0]['satName'])
+                
+                c.line(northAdf.x-height, northAdf.y, color=colorsAdhoc[colorIndex], line_width = 1)#, line_dash=[2,2], line_width=3, line_alpha = 0.9)
+                if not np.isnan(northAdf.loc[0]['x']):
+                    c.triangle(northAdf.x-height
+                            , northAdf.y
+                            , color= colorsAdhoc[colorIndex]
+                            , size = 8
+                            , alpha = 0.9
+                            , angle = northAdf.bearingToNext)
+                    c.circle(northAdf.loc[0]['x']-height, northAdf.loc[0]['y'], color = colorsAdhoc[colorIndex], size=25, alpha = 0.9)
+                    c.image_rgba(image=[hubble], x=northAdf.loc[0]['x']-height-20, y = northAdf.loc[0]['y']-20, dh =40, dw=40)
+
+                c.line(southAdf.x+height, southAdf.y, color= colorsAdhoc[colorIndex] , line_width = 1)#,line_dash=[2,2], line_width=3, line_alpha = 0.9)
+                if not np.isnan(southAdf.loc[0]['x']):
+                    c.triangle(southAdf.x+height
+                        , southAdf.y
+                        , color= colorsAdhoc[colorIndex]
+                        , size = 8
+                        , alpha = 0.9
+                        , angle = southAdf.bearingToNext)
+                    c.circle(southAdf.loc[0]['x']+height, southAdf.loc[0]['y'], color= colorsAdhoc[colorIndex], size=25, alpha = 0.9)
+                    c.image_rgba(image=[hubble], x=southAdf.loc[0]['x']+height-20, y = southAdf.loc[0]['y']-20, dh =40, dw=40)
+
     #ISS NORTH   
     c.line(northISSdf.x-height, northISSdf.y, color="purple", line_width = 1)# line_dash=[10,5], line_width=3)
     if not np.isnan(northISSdf.loc[issIndex]['x']):
@@ -388,29 +434,30 @@ def getChart(n2yokey):
         c.circle(northISSdf.loc[issIndex]['x']-height, northISSdf.loc[issIndex]['y'], color="purple", size=footprint, alpha = 0.5)
         c.image_rgba(image=[iss], x=northISSdf.loc[issIndex]['x']-height-40, y = northISSdf.loc[issIndex]['y']-40, dh =80, dw=80)
     
-    #HUBBLE NORTH
-    c.line(northHubbleDf.x-height, northHubbleDf.y, color="red", line_width = 1)#, line_dash=[2,2], line_width=3, line_alpha = 0.9)
-    if not np.isnan(northHubbleDf.loc[0]['x']):
-        c.triangle(northHubbleDf.x-height
-                , northHubbleDf.y
-                , color="red"
-                , size = 8
-                , alpha = 0.5
-                , angle = northHubbleDf.bearingToNext)
-        c.circle(northHubbleDf.loc[0]['x']-height, northHubbleDf.loc[0]['y'], color="red", size=25, alpha = 0.5)
-        c.image_rgba(image=[hubble], x=northHubbleDf.loc[0]['x']-height-20, y = northHubbleDf.loc[0]['y']-20, dh =40, dw=40)
-    
-    #USA224 NORTH
-    c.line(north224Df.x-height, north224Df.y, color="yellow", line_width = 1)#, line_dash=[2,2], line_width=3, line_alpha = 0.9)
-    if not np.isnan(north224Df.loc[0]['x']):
-        c.triangle(north224Df.x-height
-                , north224Df.y
-                , color="yellow"
-                , size = 8
-                , alpha = 0.5
-                , angle = north224Df.bearingToNext)
-        c.circle(north224Df.loc[0]['x']-height, north224Df.loc[0]['y'], color="yellow", size=25, alpha = 0.5)
-        c.image_rgba(image=[usa224], x=north224Df.loc[0]['x']-height-20, y = north224Df.loc[0]['y']-20, dh =40, dw=40)
+    if n2yokey:
+        #HUBBLE NORTH
+        c.line(northHubbleDf.x-height, northHubbleDf.y, color="red", line_width = 1)#, line_dash=[2,2], line_width=3, line_alpha = 0.9)
+        if not np.isnan(northHubbleDf.loc[0]['x']):
+            c.triangle(northHubbleDf.x-height
+                    , northHubbleDf.y
+                    , color="red"
+                    , size = 8
+                    , alpha = 0.5
+                    , angle = northHubbleDf.bearingToNext)
+            c.circle(northHubbleDf.loc[0]['x']-height, northHubbleDf.loc[0]['y'], color="red", size=25, alpha = 0.5)
+            c.image_rgba(image=[hubble], x=northHubbleDf.loc[0]['x']-height-20, y = northHubbleDf.loc[0]['y']-20, dh =40, dw=40)
+        
+        #USA224 NORTH
+        c.line(north224Df.x-height, north224Df.y, color="yellow", line_width = 1)#, line_dash=[2,2], line_width=3, line_alpha = 0.9)
+        if not np.isnan(north224Df.loc[0]['x']):
+            c.triangle(north224Df.x-height
+                    , north224Df.y
+                    , color="yellow"
+                    , size = 8
+                    , alpha = 0.5
+                    , angle = north224Df.bearingToNext)
+            c.circle(north224Df.loc[0]['x']-height, north224Df.loc[0]['y'], color="yellow", size=25, alpha = 0.5)
+            c.image_rgba(image=[usa224], x=north224Df.loc[0]['x']-height-20, y = north224Df.loc[0]['y']-20, dh =40, dw=40)
     
     #MOON NORTH
     # c.line(northMoonDf.x-height, northMoonDf.y, color="white", line_dash=[5,15], line_width=1, line_alpha = 0.6)
@@ -420,14 +467,10 @@ def getChart(n2yokey):
         , size = 5
         , alpha = 0.2
         , angle = northMoonDf.bearingToNext - 1.5708 )
-    if not np.isnan(northMoon.loc[0]['x']):    
+    if not np.isnan(northMoon.loc[0]['x']) and northMoon.loc[0]['x']<500:    
         c.image_rgba(image=[moon], x=northMoon.loc[0]['x']-height-50, y = northMoon.loc[0]['y']-50, dh =80, dw=100)
 
     c.image_rgba(image=[corners], x =-width, y=-height, dh =width, dw=width)
-
-    ###SOUTHERN HEMISPHERE
-    c.image_rgba(image=[southNight], x =0, y=-height, dh =width, dw=width)
-    c.image_rgba(image=[southDay], x =0, y=-height, dh =width, dw=width)
     
     #ISS SOUTH
     c.line(southISSdf.x+height, southISSdf.y, color="purple", line_width = 1) #line_dash=[10,5], line_width=3)
@@ -441,29 +484,30 @@ def getChart(n2yokey):
         c.circle(southISSdf.loc[issIndex]['x']+height, southISSdf.loc[issIndex]['y'], color="purple", size=footprint, alpha = 0.5)
         c.image_rgba(image=[iss], x=southISSdf.loc[issIndex]['x']+height-40, y = southISSdf.loc[issIndex]['y']-40, dh =80, dw=80)
     
-    #HUBBLE SOUTH
-    c.line(southHubbleDf.x+height, southHubbleDf.y, color="red" , line_width = 1)#,line_dash=[2,2], line_width=3, line_alpha = 0.9)
-    if not np.isnan(southHubbleDf.loc[0]['x']):
-        c.triangle(southHubbleDf.x+height
-            , southHubbleDf.y
-            , color="red"
-            , size = 8
-            , alpha = 0.5
-            , angle = southHubbleDf.bearingToNext)
-        c.circle(southHubbleDf.loc[0]['x']+height, southHubbleDf.loc[0]['y'], color="red", size=25, alpha = 0.5)
-        c.image_rgba(image=[hubble], x=southHubbleDf.loc[0]['x']+height-20, y = southHubbleDf.loc[0]['y']-20, dh =40, dw=40)
-    
-    #USA224 SOUTH
-    c.line(south224Df.x+height, south224Df.y, color="yellow", line_width = 1)# line_dash=[2,2], line_width=3, line_alpha = 0.9)
-    if not np.isnan(south224Df.loc[0]['x']):
-        c.triangle(south224Df.x+height
-            , south224Df.y
-            , color="yellow"
-            , size = 8
-            , alpha = 0.5
-            , angle = south224Df.bearingToNext)
-        c.circle(south224Df.loc[0]['x']+height, south224Df.loc[0]['y'], color="yellow", size=25, alpha = 0.5)
-        c.image_rgba(image=[usa224], x=south224Df.loc[0]['x']+height-20, y = south224Df.loc[0]['y']-20, dh =40, dw=40)
+    if n2yokey:
+        #HUBBLE SOUTH
+        c.line(southHubbleDf.x+height, southHubbleDf.y, color="red" , line_width = 1)#,line_dash=[2,2], line_width=3, line_alpha = 0.9)
+        if not np.isnan(southHubbleDf.loc[0]['x']):
+            c.triangle(southHubbleDf.x+height
+                , southHubbleDf.y
+                , color="red"
+                , size = 8
+                , alpha = 0.5
+                , angle = southHubbleDf.bearingToNext)
+            c.circle(southHubbleDf.loc[0]['x']+height, southHubbleDf.loc[0]['y'], color="red", size=25, alpha = 0.5)
+            c.image_rgba(image=[hubble], x=southHubbleDf.loc[0]['x']+height-20, y = southHubbleDf.loc[0]['y']-20, dh =40, dw=40)
+        
+        #USA224 SOUTH
+        c.line(south224Df.x+height, south224Df.y, color="yellow", line_width = 1)# line_dash=[2,2], line_width=3, line_alpha = 0.9)
+        if not np.isnan(south224Df.loc[0]['x']):
+            c.triangle(south224Df.x+height
+                , south224Df.y
+                , color="yellow"
+                , size = 8
+                , alpha = 0.5
+                , angle = south224Df.bearingToNext)
+            c.circle(south224Df.loc[0]['x']+height, south224Df.loc[0]['y'], color="yellow", size=25, alpha = 0.5)
+            c.image_rgba(image=[usa224], x=south224Df.loc[0]['x']+height-20, y = south224Df.loc[0]['y']-20, dh =40, dw=40)
 
     #MOON SOUTH
     # c.line(southMoonDf.x+height, southMoonDf.y, color="white", line_width=1, line_alpha = 0.6)#, line_dash=[5,15])    
@@ -484,20 +528,32 @@ def getChart(n2yokey):
     c.outline_line_color = None
 
     #LEGEND
-    c.circle(-960, 457, size=35, alpha = 0.5, color="purple")
-    c.image_rgba(image=[iss], x=-997, y = 415, dh =80, dw=80)
-    issLabel = Label(text = 'ISS', x = -910, y = 435, text_color = 'white', text_font_size = "10pt")
-    c.add_layout(issLabel)
+    if n2yokey:
+        c.circle(-960, 457, size=35, alpha = 0.5, color="purple")
+        c.image_rgba(image=[iss], x=-997, y = 415, dh =80, dw=80)
+        issLabel = Label(text = 'ISS', x = -910, y = 435, text_color = 'white', text_font_size = "10pt")
+        c.add_layout(issLabel)
 
-    c.circle(-960, 387, color="red", size=25, alpha = 0.5)    
-    c.image_rgba(image=[hubble], x=-980, y = 365, dh =40, dw=40)
-    hstLabel = Label(text = 'HST', x = -910, y = 370, text_color = 'white', text_font_size = "10pt")
-    c.add_layout(hstLabel)
+        c.circle(-960, 387, color="red", size=25, alpha = 0.5)    
+        c.image_rgba(image=[hubble], x=-980, y = 365, dh =40, dw=40)
+        hstLabel = Label(text = 'HST', x = -910, y = 370, text_color = 'white', text_font_size = "10pt")
+        c.add_layout(hstLabel)
 
-    c.circle(-960, 317, color="yellow", size=25, alpha = 0.5)
-    c.image_rgba(image=[usa224], x=-980, y = 295, dh =40, dw=40)
-    Two24Label = Label(text = '224', x = -910, y = 300, text_color = 'white', text_font_size = "10pt")
-    c.add_layout(Two24Label)
+        c.circle(-960, 317, color="yellow", size=25, alpha = 0.5)
+        c.image_rgba(image=[usa224], x=-980, y = 295, dh =40, dw=40)
+        Two24Label = Label(text = '224', x = -910, y = 300, text_color = 'white', text_font_size = "10pt")
+        c.add_layout(Two24Label)
+
+        if adhocSat:
+            colorsAdhoc = viridis(len(adhocSat)*2)
+            if len(adhocSat)>0:
+                for num, sat in enumerate(adhocSat, start = 0):
+                    colorIndex = num*2
+                    y = 435-num*70
+                    circle = c.circle(-40, y, color = colorsAdhoc[colorIndex], size=25, alpha = 0.9)
+                    image = c.image_rgba(image=[hubble], x=-60, y = y-20, dh =40, dw=40)
+                    adHocLabel = Label(text = adHocNames[num], x = -5, y = y-15, text_color = 'white', text_font_size = "8pt")
+                    c.add_layout(adHocLabel)
 
 
     # print (northMoon, southMoon)
