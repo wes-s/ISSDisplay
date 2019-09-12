@@ -13,8 +13,8 @@ class getDisplay(Resource):
         key = None
         if request.args:
             key = request.args.get('key', 0)
-            sats = request.args.get('satellites', None).split(',')
-            if sats is not None:
+            sats = request.args.get('satellites', None)
+            if sats:
                 sats = sats.split(',')
         script, div = components(getChart(key,sats))
         return make_response(render_template('index.html', script=script, div=div))
