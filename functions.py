@@ -1,6 +1,6 @@
 from datetime import datetime
 import pandas as pd
-from bokeh.palettes import plasma
+from bokeh.palettes import viridis
 from bokeh.plotting import figure, show, output_notebook
 from bokeh.layouts import row
 from bokeh.embed import components
