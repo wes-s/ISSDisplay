@@ -320,7 +320,7 @@ def getN2Y0sat(satId, n2yokey):
     df.columns= ['lat', 'lon', 'satName']
     return df
 
-def getChart(n2yokey, adhoc):
+def getChart(n2yokey= None, adhoc=None):
     userLat = 35 
     height = 500
     width = height*2

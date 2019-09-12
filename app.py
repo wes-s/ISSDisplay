@@ -12,7 +12,7 @@ class getDisplay(Resource):
         sats = None
         key = None
         if request.args:
-            key = request.args.get('key', 0)
+            key = request.args.get('key', None)
             sats = request.args.get('satellites', None)
             if sats:
                 sats = sats.split(',')
