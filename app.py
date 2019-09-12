@@ -14,7 +14,7 @@ class getDisplay(Resource):
         if request.args:
             key = request.args.get('key', 0)
             sats = request.args.get('satellites', None).split(',')
-        script, div = components(getChart(key), sats)
+        script, div = components(getChart(key,sats))
         return make_response(render_template('index.html', script=script, div=div))
 
 # api.add_resource(getDisplay,"/getDisplay/<string:settings>")
