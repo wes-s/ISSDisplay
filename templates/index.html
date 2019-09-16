@@ -9,13 +9,13 @@
     {{ bokeh_css }}
     {{ bokeh_js }}
 </head>
-<body onload="window.scrollTo(0,document.body.scrollHeight);">
+<body>
     {{script|safe}}
     {{div|safe}}
     <script>
         setTimeout(function(){
         window.location.reload(1);
-        }, 300000);
+        }, 1800000);
     </script>
 </body>
 </html>
