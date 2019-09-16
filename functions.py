@@ -468,7 +468,7 @@ def getChart(n2yokey=None, adhoc=None):
         , alpha = 0.2
         , angle = northMoonDf.bearingToNext - 1.5708 )
     if not np.isnan(northMoon.loc[0]['x']) and northMoon.loc[0]['x']<500:    
-        c.image_rgba(image=[moon], x=northMoon.loc[0]['x']-height-50, y = northMoon.loc[0]['y']-50, dh =80, dw=100)
+        c.image_rgba(image=[moon], x=northMoon.loc[0]['x']-height-50, y = northMoon.loc[0]['y']-50, dh =100, dw=100)
 
     c.image_rgba(image=[corners], x =-width, y=-height, dh =width, dw=width)
     
