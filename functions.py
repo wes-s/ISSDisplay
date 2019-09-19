@@ -395,10 +395,10 @@ def getChart(n2yokey=None, adhoc=None):
     adhocSat = adhoc
     if n2yokey and adhocSat:
         adHocNames =[]
-        colorsAdhoc = viridis(len(adhocSat)*2)
+        colorsAdhoc = viridis(len(adhocSat))
         if len(adhocSat)>0:
             for num, sat in enumerate(adhocSat, start = 0):
-                colorIndex = num*2
+                colorIndex = num
                 adf = getN2Y0sat(sat, n2yokey )
                 adf = adf[adf.index%100 == 0].reset_index()
                 northAdf = projectDf(adf, userLat, height)
