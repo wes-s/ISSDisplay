@@ -275,7 +275,7 @@ def getMoon():
 
     sun = ephem.Sun()
     moon = ephem.Moon()
-    names = ['Waxing Crescent', 'Waxing Gibbous','Waning Gibbous', 'Waning Crescent']
+    names = ['New', 'Waxing Crescent','First Quarter' ,'Waxing Gibbous','Full','Waning Gibbous','Third Quarter', 'Waning Crescent']
     #for n in range(1, 31):
     s = '{}/{}/{}'.format(now.year, now.month, now.day)# n)
     sun.compute(s)
@@ -286,27 +286,31 @@ def getMoon():
 
     angle = (moonlon - sunlon) % tau
     deg = round(float(math.degrees(angle)))
-    quarterIdx = int(angle * 4.0 // tau)
+    quarterIdx = int(angle * 8.0 // tau)
 
-    if 175.0 <= deg <= 185.0:
-        quarterName = 'Full'
-    elif deg>= 355.0 or deg <=5.0:
-        quarterName = 'New'
-    else:
-        quarterName = names[quarterIdx]
+    # if 175.0 <= deg <= 185.0:
+    #     quarterName = 'Full'
+    # elif deg>= 355.0 or deg <=5.0:
+    #     quarterName = 'New'
+    # else:
+    quarterName = names[quarterIdx]
 
-    if quarterName == 'Full':
-        im = Image.open('Images/moon_full.png').transpose(Image.FLIP_TOP_BOTTOM)#.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
-    elif quarterName == 'New':
-        im = Image.open('Images/moon_new.png').transpose(Image.FLIP_TOP_BOTTOM)#.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+    if quarterName == 'New':
+        im = Image.open('Images/moon_new.png').transpose(Image.FLIP_TOP_BOTTOM) 
     elif quarterName == 'Waxing Crescent':
-        im = Image.open('Images/moon_waxing_crescent.png').transpose(Image.FLIP_TOP_BOTTOM)#.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
-    elif quarterName == 'Waning Crescent':
-        im = Image.open('Images/moon_waning_crescent.png').transpose(Image.FLIP_TOP_BOTTOM)#.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+        im = Image.open('Images/moon_waxing_crescent.png').transpose(Image.FLIP_TOP_BOTTOM)
+    elif quarterName == 'First Quarter':
+        im = Image.open('Images/moon_waxing_gibbous.png').transpose(Image.FLIP_TOP_BOTTOM)
     elif quarterName == 'Waxing Gibbous':
-        im = Image.open('Images/moon_waxing_gibbous.png').transpose(Image.FLIP_TOP_BOTTOM)#.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+        im = Image.open('Images/moon_waxing_gibbous.png').transpose(Image.FLIP_TOP_BOTTOM)
+    elif quarterName == 'Full':
+        im = Image.open('Images/moon_full.png').transpose(Image.FLIP_TOP_BOTTOM)
     elif quarterName == 'Waning Gibbous':
-        im = Image.open('Images/moon_waning_gibbous.png').transpose(Image.FLIP_TOP_BOTTOM)#.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
+        im = Image.open('Images/moon_waning_gibbous.png').transpose(Image.FLIP_TOP_BOTTOM)
+    elif quarterName == 'Third Quarter':
+        im = Image.open('Images/moon_waning_gibbous.png').transpose(Image.FLIP_TOP_BOTTOM)
+    elif quarterName == 'Waning Crescent':
+        im = Image.open('Images/moon_waning_crescent.png').transpose(Image.FLIP_TOP_BOTTOM)
     imArray = np.array(im)
     return imArray
 
@@ -416,7 +420,7 @@ def getChart(n2yokey=None, adhoc=None):
         , alpha = 0.2
         , angle = northMoonDf.bearingToNext - 1.5708 )
     if not np.isnan(northMoon.loc[0]['x']) and northMoon.loc[0]['x']<500:    
-        c.image_rgba(image=[moon], x=northMoon.loc[0]['x']-height-50, y = northMoon.loc[0]['y']-50, dh =100, dw=100)
+        c.image_rgba(image=[moon], x=northMoon.loc[0]['x']-height-75, y = northMoon.loc[0]['y']-75, dh =150, dw=150)
 
     c.image_rgba(image=[corners], x =-width, y=-height, dh =width, dw=width)
     
@@ -432,7 +436,7 @@ def getChart(n2yokey=None, adhoc=None):
         , alpha = 0.2
         , angle = southMoonDf.bearingToNext - 1.5708 )
     if not np.isnan(southMoon.loc[0]['x']):
-        c.image_rgba(image=[moon], x=southMoon.loc[0]['x']+height-50, y = southMoon.loc[0]['y']-50, dh =100, dw=100)
+        c.image_rgba(image=[moon], x=southMoon.loc[0]['x']+height-75, y = southMoon.loc[0]['y']-75, dh =150, dw=150)
 
     c.image_rgba(image=[corners], x =0, y=-height, dh =width, dw=width)
     c.background_fill_color = "#000000"
