@@ -15,6 +15,7 @@
     <script>
         function checkTime(){
             var today = new Date().getHours();
+            console.log(today)
             if (today >= 7 && today <= 17) {
                 setTimeout(function(){
                     window.location.reload(1);
