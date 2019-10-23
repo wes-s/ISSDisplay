@@ -6,6 +6,6 @@ requests==2.21.0
 bokeh==1.0.4
 pandas==0.24.2
 numpy==1.13.3
-Pillow==4.2.1
+Pillow==6.2.1
 json5==0.8.5
 pyephem==3.7.7.0
