@@ -13,16 +13,17 @@
     {{script|safe}}
     {{div|safe}}
     <script>
-        function checkTime(){
-            var today = new Date().getHours();
-            console.log('hour is: '+(today));
-            if (today >= 7 && today <= 17) {
-                window.location.reload(1);
-            } 
-        }
+        // function checkTime(){
+        //     var today = new Date().getHours();
+        //     console.log('hour is: '+(today));
+        //     if (today >= 7 && today <= 17) {
+        //         window.location.reload(1);
+        //     } 
+        // }
         setInterval(function(){
                     console.log('checking time')
-                    checkTIme();
+                    // checkTIme();
+                    window.location.reload(1);
                 }, 900000);
     </script>
 </body>
