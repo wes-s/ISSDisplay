@@ -10,7 +10,7 @@ api = Api(app)
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'images'),'favicon.ico', mimetype='image/png')
+    return send_from_directory(os.path.join(app.root_path, 'Images'),'favicon.ico', mimetype='image/png')
 
 class getDisplay(Resource):
     # def get(self, settings):
