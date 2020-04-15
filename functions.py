@@ -102,8 +102,8 @@ def getISSList():
     now = datetime.timestamp(datetime.now())
 
     #start in the past 18 minutes
-    stamp = int(now - (now%60)-1080);
-    url = "https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps="+ str(stamp)+",";
+    stamp = int(now - (now%60)-1080)
+    url = "https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps="+ str(stamp)+","
 
     #append 35 more timestamps separated by 3 minutes each to the request URL
     for i in range(1,35):
