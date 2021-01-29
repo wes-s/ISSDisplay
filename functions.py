@@ -315,8 +315,9 @@ def getMoon():
     return imArray
 
 def getN2Y0sat(satId, n2yokey):
-    url="https://www.n2yo.com/rest/v1/satellite/positions/"+str(satId)+"/0/0/0/1000&apiKey="+str(n2yokey)
+    url="https://api.n2yo.com/rest/v1/satellite/positions/"+str(satId)+"/0/0/0/1000&apiKey="+str(n2yokey)
     response = requests.get(url)
+    print('n2yo request: ' + url)
     if response:
         satName = json.loads(response.content.decode("utf-8"))['info']['satname']
         df = pd.DataFrame(json.loads(response.content.decode("utf-8"))['positions'])[['satlatitude', 'satlongitude']]
