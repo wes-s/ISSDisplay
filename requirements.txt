@@ -6,7 +6,11 @@ requests==2.21.0
 bokeh==1.0.4
 pandas==0.24.2
 <<<<<<< HEAD
+<<<<<<< HEAD
 numpy==1.22.3
+=======
+numpy==1.13.3
+>>>>>>> parent of 2dae943 (Bump numpy from 1.13.3 to 1.21.0)
 Pillow==9.0.1
 =======
 numpy==1.13.3
