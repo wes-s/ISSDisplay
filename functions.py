@@ -11,7 +11,7 @@ import numpy as np
 import requests
 import json
 import ephem
-import io
+from io import BytesIO
 # from jinja2.utils import markupsafe 
 # markupsafe.Markup()
 # Markup('')
@@ -118,7 +118,8 @@ def getISSList():
     response = requests.get(url)
     if response:
         # df = pd.read_json(response.content)
-        df = pd.read_json(io.BytesIO(json.dumps(response.content, ensure_ascii=False).encode('utf8')), encoding='utf-8').to_csv(name, encoding="utf-8")
+        df = pd.read_json(BytesIO(response.content))
+        # df = pd.read_json(io.BytesIO(json.dumps(response.content, ensure_ascii=False).encode('utf8')), encoding='utf-8').to_csv(name, encoding="utf-8")
 #     df = issDf[['latitude','longitude']]
     df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
     'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
