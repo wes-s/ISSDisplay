@@ -366,7 +366,8 @@ def getChart(n2yokey=None, adhoc=None):
     northMoon = getMoonLocation(userLat, height)
     southMoon = getMoonLocation(-userLat, height)
     moon = getMoon()
-    footprint = int(2*math.sqrt((((issDf.loc[issIndex]['footprint']or 1)*width)/height)/math.pi))
+    footprint = int(2*math.sqrt(((issDf.loc[issIndex]['footprint']*width)/height)/math.pi))
+    # footprint = int(2*math.sqrt((((issDf.loc[issIndex]['footprint']or 1)*width)/height)/math.pi))
 
     if not np.isnan(northISSdf.loc[issIndex]['x']):
         text = 'Lat:'+str(round(northISSdf.loc[issIndex]['lat'],2))\
@@ -376,8 +377,8 @@ def getChart(n2yokey=None, adhoc=None):
     elif not np.isnan(southISSdf.loc[issIndex]['x']):
         text = 'Lat:'+str(round(southISSdf.loc[issIndex]['lat'],2))\
             +' Lon:'+str(round(southISSdf.loc[issIndex]['lon'],2))\
-            # +'\r\nAltitude:'+str(round(southISSdf.loc[issIndex]['altitude'],2))+' '+str(southISSdf.loc[5]['units'])\
-            # +'\r\nSpeed:'+str(round(southISSdf.loc[issIndex]['velocity'],2))+' '+str(southISSdf.loc[5]['units']+' per hour')
+            +'\r\nAltitude:'+str(round(southISSdf.loc[issIndex]['altitude'],2))+' '+str(southISSdf.loc[5]['units'])\
+            +'\r\nSpeed:'+str(round(southISSdf.loc[issIndex]['velocity'],2))+' '+str(southISSdf.loc[5]['units']+' per hour')
     else:
         text = ''
 
