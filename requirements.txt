@@ -4,11 +4,11 @@ Jinja2==3.0.1
 gunicorn==20.1.0
 Werkzeug==2.2.2
 requests==2.21.0
-bokeh==1.0.4
+bokeh==2.4.3
 pandas==1.5.1
 numpy==1.23.0
 Pillow==8.3.2
-json5==0.8.5
-pyephem==3.7.7.0
+json5
+pyephem
 itsdangerous==2.0.1
 MarkupSafe==2.1.1
