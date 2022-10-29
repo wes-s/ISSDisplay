@@ -366,7 +366,7 @@ def getChart(n2yokey=None, adhoc=None):
     northMoon = getMoonLocation(userLat, height)
     southMoon = getMoonLocation(-userLat, height)
     moon = getMoon()
-    footprint = int(2*math.sqrt(((issDf.loc[issIndex]['footprint']*width)/height)/math.pi))
+    footprint = int(2*math.sqrt((((issDf.loc[issIndex]['footprint']or 1)*width)/height)/math.pi))
 
     if not np.isnan(northISSdf.loc[issIndex]['x']):
         text = 'Lat:'+str(round(northISSdf.loc[issIndex]['lat'],2))\
