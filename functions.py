@@ -376,8 +376,8 @@ def getChart(n2yokey=None, adhoc=None):
     elif not np.isnan(southISSdf.loc[issIndex]['x']):
         text = 'Lat:'+str(round(southISSdf.loc[issIndex]['lat'],2))\
             +' Lon:'+str(round(southISSdf.loc[issIndex]['lon'],2))\
-            +'\r\nAltitude:'+str(round(southISSdf.loc[issIndex]['altitude'],2))+' '+str(southISSdf.loc[5]['units'])\
-            +'\r\nSpeed:'+str(round(southISSdf.loc[issIndex]['velocity'],2))+' '+str(southISSdf.loc[5]['units']+' per hour')
+            # +'\r\nAltitude:'+str(round(southISSdf.loc[issIndex]['altitude'],2))+' '+str(southISSdf.loc[5]['units'])\
+            # +'\r\nSpeed:'+str(round(southISSdf.loc[issIndex]['velocity'],2))+' '+str(southISSdf.loc[5]['units']+' per hour')
     else:
         text = ''
 
