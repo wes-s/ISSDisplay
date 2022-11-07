@@ -6,7 +6,7 @@ from functions import *
 import os
 
 app = Flask(__name__)
-api =  Api(app)
+api = Api(app)
 
 @app.route('/favicon.ico')
 def favicon():
