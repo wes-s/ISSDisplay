@@ -12,9 +12,6 @@ import requests
 import json
 import ephem
 from io import BytesIO
-# from jinja2.utils import markupsafe 
-# markupsafe.Markup()
-# Markup('')
 def dmsToDecDeg(dms):
     deg = float(dms[0])
     min = float(dms[1])/60
@@ -115,14 +112,14 @@ def getISSList():
             url = url + str(stamp+(180*i))+ ','
         else:
             url = url + str(stamp+(180*i))+ '&units=miles'
-    response = requests.get(url)
-    if response:
-        # df = pd.read_json(response.content)
-        df = pd.read_json(BytesIO(response.content))
-        # df = pd.read_json(io.BytesIO(json.dumps(response.content, ensure_ascii=False).encode('utf8')), encoding='utf-8').to_csv(name, encoding="utf-8")
+#     response = requests.get(url)
+#     if response:
+#         df = pd.read_json(BytesIO(response.content))
+    df = pd.read_json(url)
 #     df = issDf[['latitude','longitude']]
-    df.columns = ['name', 'id', 'lat', 'lon', 'altitude', 'velocity', 'visibility', 
-                  'footprint', 'timestamp', 'daynum', 'solar_lat', 'solar_lon', 'units']
+#     df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
+#     'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
+#     'visibility']
     return df
 
 def projectDf(df, userLat, height):
@@ -366,7 +363,6 @@ def getChart(n2yokey=None, adhoc=None):
     southMoon = getMoonLocation(-userLat, height)
     moon = getMoon()
     footprint = int(2*math.sqrt(((issDf.loc[issIndex]['footprint']*width)/height)/math.pi))
-    # footprint = int(2*math.sqrt((((issDf.loc[issIndex]['footprint']or 1)*width)/height)/math.pi))
 
     if not np.isnan(northISSdf.loc[issIndex]['x']):
         text = 'Lat:'+str(round(northISSdf.loc[issIndex]['lat'],2))\
