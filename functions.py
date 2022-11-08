@@ -11,6 +11,7 @@ import numpy as np
 import requests
 import json
 import ephem
+from io import BytesIO
 def dmsToDecDeg(dms):
     deg = float(dms[0])
     min = float(dms[1])/60
@@ -111,13 +112,14 @@ def getISSList():
             url = url + str(stamp+(180*i))+ ','
         else:
             url = url + str(stamp+(180*i))+ '&units=miles'
-    response = requests.get(url)
-    if response:
-        df = pd.read_json(response.content)
+#     response = requests.get(url)
+#     if response:
+#         df = pd.read_json(BytesIO(response.content))
+    df = pd.read_json(url)
 #     df = issDf[['latitude','longitude']]
-    df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
-    'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
-    'visibility']
+#     df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
+#     'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
+#     'visibility']
     return df
 
 def projectDf(df, userLat, height):
