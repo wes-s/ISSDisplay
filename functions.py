@@ -117,9 +117,11 @@ def getISSList():
 #         df = pd.read_json(BytesIO(response.content))
     df = pd.read_json(url)
 #     df = issDf[['latitude','longitude']]
-#     df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
-#     'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
-#     'visibility']
+    # df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
+    # 'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
+    # 'visibility']
+    df.columns = ['name','id','lat','lon','altitude','velocity','visibility',
+    'footprint','timestamp','daynum','solar_lat','solar_lon','units']
     return df
 
 def projectDf(df, userLat, height):
