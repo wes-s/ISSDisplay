@@ -196,7 +196,7 @@ def getDay(userLat, height):
         imFilter.transpose(Image.FLIP_TOP_BOTTOM)
     else:
         imFilter.transpose(Image.FLIP_LEFT_RIGHT)
-    imFilterArray = np.array(imFilter)
+    imFilterArray = np.asarray(imFilter)
 
 
     # read image as RGB and add alpha (transparency)
@@ -242,7 +242,8 @@ def getDay(userLat, height):
 
     newIm = Image.fromarray(newImArray, "RGBA")
     # back to Image from numpy
-    finalImArray = np.array(newIm)
+    finalImArray = np.asarray(newIm)
+    print('derpydo')
     return finalImArray
 
 def getNight(userLat):
@@ -250,7 +251,7 @@ def getNight(userLat):
         im = Image.open('Images/north_night.png').transpose(Image.FLIP_TOP_BOTTOM)
     else:
         im = Image.open('Images/south_night.png').transpose(Image.FLIP_TOP_BOTTOM)
-    imArray = np.array(im)
+    imArray = np.asarray(im)
     return imArray
 
 def getCorners():
