@@ -243,7 +243,7 @@ def getDay(userLat, height):
     newIm = Image.fromarray(newImArray, "RGBA")
     # back to Image from numpy
     finalImArray = np.array(newIm)
-    fiunalImArray = finalImArray.view("uint32").reshape(np_img.shape[:2])
+    fiunalImArray = finalImArray.view("uint32").reshape(finalImArray.shape[:2])
     return finalImArray
 
 def getNight(userLat):
@@ -252,6 +252,7 @@ def getNight(userLat):
     else:
         im = Image.open('Images/south_night.png').transpose(Image.FLIP_TOP_BOTTOM)
     imArray = np.array(im)
+    imArray = imArray.view("uint32").reshape(imArray.shape[:2])
     return [imArray]
 
 def getCorners():
