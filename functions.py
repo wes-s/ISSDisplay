@@ -243,8 +243,8 @@ def getDay(userLat, height):
     newIm = Image.fromarray(newImArray, "RGBA")
     # back to Image from numpy
     finalImArray = np.array(newIm)
-    fiunalImArray = finalImArray.view("uint32").reshape(finalImArray.shape[:2])
-    return finalImArray
+    result = finalImArray.view("uint32").reshape(finalImArray.shape[:2])
+    return result
 
 def getNight(userLat):
     if userLat >= 0:
