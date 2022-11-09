@@ -252,8 +252,8 @@ def getNight(userLat):
     else:
         im = Image.open('Images/south_night.png').transpose(Image.FLIP_TOP_BOTTOM)
     imArray = np.array(im)
-    imArray = imArray.view("uint32").reshape(imArray.shape[:2])
-    return [imArray]
+    np_img2d = imArray.view("uint32").reshape(imArray.shape[:2])
+    return imArray
 
 def getCorners():
     im = Image.open('Images/corners.png')#.convert('RGBA')
