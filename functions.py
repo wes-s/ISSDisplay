@@ -12,6 +12,7 @@ import requests
 import json
 import ephem
 from io import BytesIO
+
 def dmsToDecDeg(dms):
     deg = float(dms[0])
     min = float(dms[1])/60
