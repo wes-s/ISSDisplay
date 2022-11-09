@@ -196,7 +196,7 @@ def getDay(userLat, height):
         imFilter.transpose(Image.FLIP_TOP_BOTTOM)
     else:
         imFilter.transpose(Image.FLIP_LEFT_RIGHT)
-    imFilterArray = np.asarray(imFilter)
+    imFilterArray = np.array(imFilter)
 
 
     # read image as RGB and add alpha (transparency)
@@ -208,7 +208,7 @@ def getDay(userLat, height):
         im = Image.open('Images/south_day.png').transpose(Image.FLIP_TOP_BOTTOM)#.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
 
     # convert to numpy (for convenience)
-    imArray = np.asarray(im)
+    imArray = np.array(im)
 
     # create mask
     # polygon = tuples # [(100,100), (200,100), (150,150)]
@@ -242,8 +242,7 @@ def getDay(userLat, height):
 
     newIm = Image.fromarray(newImArray, "RGBA")
     # back to Image from numpy
-    finalImArray = np.asarray(newIm)
-    print('derpydo')
+    finalImArray = np.array(newIm)
     return finalImArray
 
 def getNight(userLat):
@@ -251,8 +250,9 @@ def getNight(userLat):
         im = Image.open('Images/north_night.png').transpose(Image.FLIP_TOP_BOTTOM)
     else:
         im = Image.open('Images/south_night.png').transpose(Image.FLIP_TOP_BOTTOM)
-    imArray = np.asarray(im)
-    return imArray
+    display(im)
+    imArray = np.array(im)
+    return [imArray]
 
 def getCorners():
     im = Image.open('Images/corners.png')#.convert('RGBA')
