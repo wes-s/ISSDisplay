@@ -250,7 +250,6 @@ def getNight(userLat):
         im = Image.open('Images/north_night.png').transpose(Image.FLIP_TOP_BOTTOM)
     else:
         im = Image.open('Images/south_night.png').transpose(Image.FLIP_TOP_BOTTOM)
-    display(im)
     imArray = np.array(im)
     return [imArray]
 
