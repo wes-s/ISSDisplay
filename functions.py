@@ -258,21 +258,25 @@ def getNight(userLat):
 def getCorners():
     im = Image.open('Images/corners.png')#.convert('RGBA')
     imArray = np.array(im)
+    imArray = imArray.view("uint32").reshape(imArray.shape[:2])
     return imArray
 
 def getISS():
     im = Image.open('Images/iss.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
     imArray = np.array(im)
+    imArray = imArray.view("uint32").reshape(imArray.shape[:2])
     return imArray
 
 def getHubbleIcon():
     im = Image.open('Images/hubble.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
     imArray = np.array(im)
+    imArray = imArray.view("uint32").reshape(imArray.shape[:2])
     return imArray
 
 def getUSA224Icon():
     im = Image.open('Images/usa_224.png').convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
     imArray = np.array(im)
+    imArray = imArray.view("uint32").reshape(imArray.shape[:2])
     return imArray
 
 def getMoon():
@@ -319,6 +323,7 @@ def getMoon():
     elif quarterName == 'Waning Crescent':
         im = Image.open('Images/moon_waning_crescent.png').transpose(Image.FLIP_TOP_BOTTOM)
     imArray = np.array(im)
+    imArray = imArray.view("uint32").reshape(imArray.shape[:2])
     return imArray
 
 def getN2Y0sat(satId, n2yokey):
