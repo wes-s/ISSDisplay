@@ -100,27 +100,15 @@ def getMoonList():
     return df
 
 def getISSList():
-
     now = datetime.timestamp(datetime.now())
     stamp = int(now - (now%60) - 1080)
-
     # use a list comprehension to create the timestamps
     timestamps = [stamp + (180 * i) for i in range(1, 35)]
-
     # use the join method to create the URL
-    url = f"https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps={','.join(timestamps)}&units=miles"
-    
-#     response = requests.get(url)
-#     if response:
-#         df = pd.read_json(BytesIO(response.content))
+    url =  "https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps="+','.join(map(str, timestamps))+"&units=miles"
     df = pd.read_json(url)
-#     df = issDf[['latitude','longitude']]
-    # df.columns = ['altitude', 'daynum', 'footprint', 'id', 'lat', 'lon',
-    # 'name', 'solar_lat', 'solar_lon', 'timestamp', 'units', 'velocity',
-    # 'visibility']
     df.columns = ['name','id','lat','lon','altitude','velocity','visibility',
     'footprint','timestamp','daynum','solar_lat','solar_lon','units']
-    return df
 
 def projectDf(df, userLat, height):
 
