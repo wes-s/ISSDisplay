@@ -102,17 +102,14 @@ def getMoonList():
 def getISSList():
 
     now = datetime.timestamp(datetime.now())
+    stamp = int(now - (now%60) - 1080)
 
-    #start in the past 18 minutes
-    stamp = int(now - (now%60)-1080)
-    url = "https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps="+ str(stamp)+","
+    # use a list comprehension to create the timestamps
+    timestamps = [stamp + (180 * i) for i in range(1, 35)]
 
-    #append 35 more timestamps separated by 3 minutes each to the request URL
-    for i in range(1,35):
-        if i < 34:
-            url = url + str(stamp+(180*i))+ ','
-        else:
-            url = url + str(stamp+(180*i))+ '&units=miles'
+    # use the join method to create the URL
+    url = f"https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps={','.join(timestamps)}&units=miles"
+    
 #     response = requests.get(url)
 #     if response:
 #         df = pd.read_json(BytesIO(response.content))
