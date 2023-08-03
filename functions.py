@@ -99,7 +99,7 @@ def getMoonList():
     df = pd.DataFrame.from_dict(moonList, orient='index')
     return df
 
-def getISSList():
+def getISSListOld():
     now = datetime.timestamp(datetime.now())
     stamp = int(now - (now%60) - 1080)
     # use a list comprehension to create the timestamps
@@ -109,6 +109,29 @@ def getISSList():
     df = pd.read_json(url)
     df.columns = ['name','id','lat','lon','altitude','velocity','visibility',
     'footprint','timestamp','daynum','solar_lat','solar_lon','units']
+
+def getISSList():
+    now = datetime.timestamp(datetime.now())
+
+    #start in the past 18 minutes
+    stamp = int(now - (now%60)-1080)
+    url = "https://api.wheretheiss.at/v1/satellites/25544/positions?timestamps="+ str(stamp)+","
+
+    #append 35 more timestamps separated by 3 minutes each to the request URL
+    for i in range(1,35):
+        if i < 34:
+            url = url + str(stamp+(180*i))+ ','
+        else:
+            url = url + str(stamp+(180*i))+ '&units=miles'
+    response = requests.get(url)
+    if response:
+        # df = pd.read_json(response.content)
+        df = pd.read_json(BytesIO(response.content))
+        # df = pd.read_json(io.BytesIO(json.dumps(response.content, ensure_ascii=False).encode('utf8')), encoding='utf-8').to_csv(name, encoding="utf-8")
+#     df = issDf[['latitude','longitude']]
+    df.columns = ['name', 'id', 'lat', 'lon', 'altitude', 'velocity', 'visibility', 
+                  'footprint', 'timestamp', 'daynum', 'solar_lat', 'solar_lon', 'units']
+    return df
 
 def projectDf(df, userLat, height):
 
