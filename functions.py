@@ -380,7 +380,8 @@ def getChart(n2yokey=None, adhoc=None):
     northMoon = getMoonLocation(userLat, height)
     southMoon = getMoonLocation(-userLat, height)
     moon = getMoon()
-    footprint = int(2*math.sqrt(((issDf.loc[issIndex]['footprint']*width)/height)/math.pi))
+    footprint = int(2*math.sqrt(((abs(issDf.loc[issIndex]['footprint'])*width)/height)/math.pi))
+    # footprint = int(2*math.sqrt((((issDf.loc[issIndex]['footprint']or 1)*width)/height)/math.pi))
 
     if not np.isnan(northISSdf.loc[issIndex]['x']):
         text = 'Lat:'+str(round(northISSdf.loc[issIndex]['lat'],2))\
@@ -396,12 +397,11 @@ def getChart(n2yokey=None, adhoc=None):
         text = ''
 
     c = figure(width = width, height = height, x_range =(-width, width), y_range=(-height,height))
-    #####Temp Disabled because it was causing the image to squash with new version of bokeh
-    # c.title.text = text
-    # c.title.align = "center"
-    # c.title.text_color = "white"
-    # c.title.text_font_size = "12px"
-    # c.title.background_fill_color = "black"
+    c.title.text = text
+    c.title.align = "center"
+    c.title.text_color = "white"
+    c.title.text_font_size = "12px"
+    c.title.background_fill_color = "black"
 
     ###NORTHERN HEMISPHERE
     c.image_rgba(image=[northNight], x =-width, y=-height, dh =width, dw=width)
