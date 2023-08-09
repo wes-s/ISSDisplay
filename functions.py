@@ -16,7 +16,7 @@ from io import BytesIO
 def dmsToDecDeg(dms):
     deg = float(dms[0])
     min = float(dms[1])/60
-    sec = float(dms[2])/3600 
+    sec = float(dms[2])/3600
     sign = float(np.sign(deg))
 
     if deg <0:
@@ -55,7 +55,7 @@ def getSunList(userLat, height):
 def getMoonLocation(userLat, height):
     home = ephem.Observer()
     if userLat >= 0:
-        home.lat, home.lon = -90, 0 
+        home.lat, home.lon = -90, 0
     else:
         home.lat, home.lon = -90, 0
 
@@ -129,7 +129,7 @@ def getISSList():
         df = pd.read_json(BytesIO(response.content))
         # df = pd.read_json(io.BytesIO(json.dumps(response.content, ensure_ascii=False).encode('utf8')), encoding='utf-8').to_csv(name, encoding="utf-8")
 #     df = issDf[['latitude','longitude']]
-    df.columns = ['name', 'id', 'lat', 'lon', 'altitude', 'velocity', 'visibility', 
+    df.columns = ['name', 'id', 'lat', 'lon', 'altitude', 'velocity', 'visibility',
                   'footprint', 'timestamp', 'daynum', 'solar_lat', 'solar_lon', 'units']
     return df
 
@@ -152,11 +152,11 @@ def projectDf(df, userLat, height):
             rads = math.atan2(deltaY, deltaX)-1.5708
             df.at[i,'bearingToNext'] = rads
             bearingToNext = rads
-        else:      
+        else:
             df.at[i,'bearingToNext'] = bearingToNext#bearingToNext+ df.iloc[i-1]['bearingToNext']-df.iloc[i-2]['bearingToNext']
 
     #check to see if coordinate overruns boundary of chart and set to NaN
-    #so the ISS path won't bleed over into the chart beside it. 
+    #so the ISS path won't bleed over into the chart beside it.
     if userLat >= 0:
         df.loc[df.eval('x<=500'), 'keepx'] = df.x
         df.loc[df.eval('x<=500'), 'keepy'] = df.y
@@ -166,7 +166,7 @@ def projectDf(df, userLat, height):
     df['x'] = df['keepx']
     df['y'] = df['keepy']
     df.drop(['keepx', 'keepy'], axis=1)
-    # df.drop(['keepy'],axis=1)    
+    # df.drop(['keepy'],axis=1)
     return df
 
 def eqAzProjection(s , userLat, height):
@@ -210,7 +210,7 @@ def getDay(userLat, height):
     # read image as RGB and add alpha (transparency)
     if userLat >=0:
         #GOOD FOR SUMMER N-HEM
-        im = Image.open('Images/north_day.png').transpose(Image.FLIP_TOP_BOTTOM)#.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)    
+        im = Image.open('Images/north_day.png').transpose(Image.FLIP_TOP_BOTTOM)#.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
     else:
         #GOOD FOR WINTER S-HEM
         im = Image.open('Images/south_day.png').transpose(Image.FLIP_TOP_BOTTOM)#.convert('RGBA').transpose(Image.FLIP_TOP_BOTTOM)
@@ -315,7 +315,7 @@ def getMoon():
     quarterName = names[quarterIdx]
 
     if quarterName == 'New':
-        im = Image.open('Images/moon_new.png').transpose(Image.FLIP_TOP_BOTTOM) 
+        im = Image.open('Images/moon_new.png').transpose(Image.FLIP_TOP_BOTTOM)
     elif quarterName == 'Waxing Crescent':
         im = Image.open('Images/moon_waxing_crescent.png').transpose(Image.FLIP_TOP_BOTTOM)
     elif quarterName == 'First Quarter':
@@ -358,7 +358,7 @@ def plotSat(figure, imageHeight, color, pathDf, satLoc, directionalArrowSize, ci
         figure.image_rgba(image=[iconImage], x=pathDf.loc[satLoc]['x']-imageHeight-(iconSize/2), y = pathDf.loc[satLoc]['y']-(iconSize/2), dh =iconSize, dw=iconSize)
 
 def getChart(n2yokey=None, adhoc=None):
-    userLat = 35 
+    userLat = 35
     height = 500
     width = height*2
     issIndex = 6
@@ -397,11 +397,11 @@ def getChart(n2yokey=None, adhoc=None):
         text = ''
 
     c = figure(width = width, height = height, x_range =(-width, width), y_range=(-height,height))
-    c.title.text = text
-    c.title.align = "center"
-    c.title.text_color = "white"
-    c.title.text_font_size = "12px"
-    c.title.background_fill_color = "black"
+    #c.title.text = text
+    #c.title.align = "center"
+    #c.title.text_color = "white"
+    #c.title.text_font_size = "12px"
+    #c.title.background_fill_color = "black"
 
     ###NORTHERN HEMISPHERE
     c.image_rgba(image=[northNight], x =-width, y=-height, dh =width, dw=width)
@@ -410,10 +410,10 @@ def getChart(n2yokey=None, adhoc=None):
     ###SOUTHERN HEMISPHERE
     c.image_rgba(image=[southNight], x =0, y=-height, dh =width, dw=width)
     c.image_rgba(image=[southDay], x =0, y=-height, dh =width, dw=width)
-    
+
     ###SATELLITES
     #ADHOC SAT NORTH AND SOUTH
-    #ADHOC SATS i.e. NOAA19: 33591 ; GOES 15: 36411 ; LANDSAT 8: 39084; 
+    #ADHOC SATS i.e. NOAA19: 33591 ; GOES 15: 36411 ; LANDSAT 8: 39084;
     adhocSat = adhoc
     if n2yokey and adhocSat:
         adHocNames =[]
@@ -425,12 +425,12 @@ def getChart(n2yokey=None, adhoc=None):
                 adf = adf[adf.index%100 == 0].reset_index()
                 northAdf = projectDf(adf, userLat, height)
                 southAdf = projectDf(adf, -userLat, height)
-                
+
                 adHocNames.append(northAdf.loc[0]['satName'])
                 plotSat(c, height, colorsAdhoc[colorIndex], northAdf, 0, 8, 25, hubble, 40)
                 plotSat(c, -height, colorsAdhoc[colorIndex], southAdf, 0, 8, 25, hubble, 40)
-                
-    #ISS NORTH   
+
+    #ISS NORTH
     plotSat(c, height, "purple", northISSdf, issIndex, 10, footprint, iss, 80, 0.5, 0.8)
 
     #MOON NORTH
@@ -441,16 +441,16 @@ def getChart(n2yokey=None, adhoc=None):
         , size = 5
         , alpha = 0.2
         , angle = northMoonDf.bearingToNext - 1.5708 )
-    if not np.isnan(northMoon.loc[0]['x']) and northMoon.loc[0]['x']<500:    
+    if not np.isnan(northMoon.loc[0]['x']) and northMoon.loc[0]['x']<500:
         c.image_rgba(image=[moon], x=northMoon.loc[0]['x']-height-75, y = northMoon.loc[0]['y']-75, dh =150, dw=150)
 
     c.image_rgba(image=[corners], x =-width, y=-height, dh =width, dw=width)
-    
+
     #ISS SOUTH
     plotSat(c, -height, "purple", southISSdf, issIndex, 10, footprint, iss, 80, 0.5, 0.8)
 
     #MOON SOUTH
-    # c.line(southMoonDf.x+height, southMoonDf.y, color="white", line_width=1, line_alpha = 0.6)#, line_dash=[5,15])    
+    # c.line(southMoonDf.x+height, southMoonDf.y, color="white", line_width=1, line_alpha = 0.6)#, line_dash=[5,15])
     c.triangle(southMoonDf.x+height
         , southMoonDf.y
         , color="white"
