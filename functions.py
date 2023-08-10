@@ -396,12 +396,12 @@ def getChart(n2yokey=None, adhoc=None):
     else:
         text = ''
 
-    c = figure(width = width, height = height, x_range =(-width, width), y_range=(-height,height))
-    #c.title.text = text
-    #c.title.align = "center"
-    #c.title.text_color = "white"
-    #c.title.text_font_size = "12px"
-    #c.title.background_fill_color = "black"
+    c = figure(width = width, height = height+50, x_range =(-width, width), y_range=(-height,height))
+    c.title.text = text
+    c.title.align = "center"
+    c.title.text_color = "white"
+    c.title.text_font_size = "12px"
+    c.title.background_fill_color = "black"
 
     ###NORTHERN HEMISPHERE
     c.image_rgba(image=[northNight], x =-width, y=-height, dh =width, dw=width)
