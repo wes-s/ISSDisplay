@@ -7,7 +7,7 @@ requests==2.31.0
 bokeh==3.0.1
 pandas==1.5.1
 numpy==1.23.0
-Pillow==10.0.1
+Pillow==10.2.0
 json5
 pyephem
 itsdangerous==2.0.1
